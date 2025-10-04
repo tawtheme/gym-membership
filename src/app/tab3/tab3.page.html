@@ -1,0 +1,164 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Backup & Restore</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Backup & Restore</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Backup Settings -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Backup Settings</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Enable Automatic Backup</ion-label>
+        <ion-toggle 
+          [(ngModel)]="backupSettings.isEnabled" 
+          (ionChange)="onBackupToggleChange()"
+          color="success">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item *ngIf="backupSettings.isEnabled">
+        <ion-label position="stacked">Backup Frequency</ion-label>
+        <ion-select 
+          [(ngModel)]="backupSettings.frequency" 
+          (ionChange)="onFrequencyChange()"
+          placeholder="Select frequency">
+          <ion-select-option value="daily">Daily</ion-select-option>
+          <ion-select-option value="weekly">Weekly</ion-select-option>
+          <ion-select-option value="monthly">Monthly</ion-select-option>
+          <ion-select-option value="yearly">Yearly</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Manual Backup -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Manual Backup</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Create a backup of all your gym data. This backup can be restored later or shared with other devices.</p>
+      
+      <ion-button 
+        expand="block" 
+        (click)="createBackup()" 
+        [disabled]="isCreatingBackup"
+        class="ion-margin-top">
+        <ion-spinner *ngIf="isCreatingBackup" name="crescent"></ion-spinner>
+        <ion-icon *ngIf="!isCreatingBackup" name="cloud-upload" slot="start"></ion-icon>
+        <span *ngIf="!isCreatingBackup">Create Backup</span>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Backup History -->
+  <ion-card *ngIf="lastBackupDate">
+    <ion-card-header>
+      <ion-card-title>Last Backup</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-icon name="time" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Last Backup Date</h3>
+          <p>{{ formatDate(lastBackupDate) }}</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item>
+        <ion-icon name="calendar" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Next Backup</h3>
+          <p>{{ nextBackupDate ? formatDate(nextBackupDate) : 'Not scheduled' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Restore Backup -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Restore Backup</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Restore your gym data from a previously created backup file.</p>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="restoreBackup()" 
+        [disabled]="isRestoringBackup"
+        class="ion-margin-top">
+        <ion-spinner *ngIf="isRestoringBackup" name="crescent"></ion-spinner>
+        <ion-icon *ngIf="!isRestoringBackup" name="cloud-download" slot="start"></ion-icon>
+        <span *ngIf="!isRestoringBackup">Restore from File</span>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Database Info -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Database Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>View information about the local SQLite database file.</p>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="showDatabaseInfo()" 
+        class="ion-margin-top">
+        <ion-icon name="information-circle" slot="start"></ion-icon>
+        Show Database Info
+      </ion-button>
+
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="inspectDatabase()" 
+        class="ion-margin-top">
+        <ion-icon name="eye" slot="start"></ion-icon>
+        Inspect Database Tables
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Export/Import -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Export/Import Data</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Export your data to share or import data from another device.</p>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="exportData()" 
+        class="ion-margin-top">
+        <ion-icon name="download" slot="start"></ion-icon>
+        Export Data
+      </ion-button>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="importData()" 
+        class="ion-margin-top">
+        <ion-icon name="upload" slot="start"></ion-icon>
+        Import Data
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,93 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Gym Members</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addMember()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Gym Members</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Search Bar -->
+  <ion-searchbar 
+    [(ngModel)]="searchTerm" 
+    (ionInput)="onSearchChange($event)"
+    placeholder="Search members..."
+    show-clear-button="focus">
+  </ion-searchbar>
+
+  <!-- Filter Buttons -->
+  <ion-segment [(ngModel)]="filterType" (ionChange)="onFilterChange()">
+    <ion-segment-button value="all">
+      <ion-label>All</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="active">
+      <ion-label>Active</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="expiring">
+      <ion-label>Expiring</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Members List -->
+  <ion-list>
+    <ion-item-sliding *ngFor="let member of filteredMembers">
+      <ion-item>
+        <ion-avatar slot="start">
+          <ion-icon name="person" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ member.name }}</h2>
+          <p>{{ member.phone }}</p>
+          <p>
+            <ion-badge [color]="getMembershipBadgeColor(member.membershipType)">
+              {{ member.membershipType | titlecase }}
+            </ion-badge>
+            <ion-badge [color]="getStatusBadgeColor(member.isActive, member.endDate)">
+              {{ getStatusText(member.isActive, member.endDate) }}
+            </ion-badge>
+          </p>
+          <p>Expires: {{ formatDate(member.endDate) }}</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item-options side="end">
+        <ion-item-option color="primary" (click)="editMember(member)">
+          <ion-icon name="create" slot="icon-only"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="success" (click)="sendReminder(member)">
+          <ion-icon name="notifications" slot="icon-only"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="deleteMember(member)">
+          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredMembers.length === 0" class="empty-state">
+    <ion-icon name="people-outline" size="large"></ion-icon>
+    <h2>No Members Found</h2>
+    <p>Start by adding your first gym member</p>
+    <ion-button (click)="addMember()" fill="outline">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Add Member
+    </ion-button>
+  </div>
+
+  <!-- Floating Action Button -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addMember()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

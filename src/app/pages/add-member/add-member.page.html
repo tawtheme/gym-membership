@@ -1,0 +1,137 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/members"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form #memberForm="ngForm" (ngSubmit)="onSubmit()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Member Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Full Name *</ion-label>
+          <ion-input 
+            type="text" 
+            [(ngModel)]="member.name" 
+            name="name"
+            placeholder="Enter member's full name"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Phone Number *</ion-label>
+          <ion-input 
+            type="tel" 
+            [(ngModel)]="member.phone" 
+            name="phone"
+            placeholder="Enter phone number"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Email (Optional)</ion-label>
+          <ion-input 
+            type="email" 
+            [(ngModel)]="member.email" 
+            name="email"
+            placeholder="Enter email address">
+          </ion-input>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Membership Details</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Membership Type *</ion-label>
+          <ion-select 
+            [(ngModel)]="member.membershipType" 
+            name="membershipType"
+            placeholder="Select membership type"
+            required>
+            <ion-select-option value="monthly">Monthly</ion-select-option>
+            <ion-select-option value="quarterly">Quarterly</ion-select-option>
+            <ion-select-option value="yearly">Yearly</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Start Date *</ion-label>
+          <ion-datetime 
+            [(ngModel)]="member.startDate" 
+            name="startDate"
+            display-format="MMM DD, YYYY"
+            picker-format="MMM DD YYYY"
+            required>
+          </ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">End Date *</ion-label>
+          <ion-datetime 
+            [(ngModel)]="member.endDate" 
+            name="endDate"
+            display-format="MMM DD, YYYY"
+            picker-format="MMM DD YYYY"
+            required>
+          </ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Status</ion-label>
+          <ion-toggle 
+            [(ngModel)]="member.isActive" 
+            name="isActive"
+            color="success">
+          </ion-toggle>
+          <ion-label>Active Member</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Additional Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Notes (Optional)</ion-label>
+          <ion-textarea 
+            [(ngModel)]="member.notes" 
+            name="notes"
+            placeholder="Add any additional notes about this member"
+            rows="3">
+          </ion-textarea>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="form-actions">
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="!memberForm.valid || isLoading"
+        class="ion-margin">
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">{{ isEditMode ? 'Update Member' : 'Add Member' }}</span>
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

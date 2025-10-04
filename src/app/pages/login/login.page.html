@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Gym Membership Login
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="login-container">
+    <div class="logo-section">
+      <ion-icon name="fitness" size="large" color="primary"></ion-icon>
+      <h1>Gym Manager</h1>
+      <p>Manage your gym memberships</p>
+    </div>
+
+    <ion-card>
+      <ion-card-content>
+        <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+          <ion-item>
+            <ion-label position="stacked">Mobile Number</ion-label>
+            <ion-input 
+              type="tel" 
+              [(ngModel)]="mobileNumber" 
+              name="mobileNumber"
+              placeholder="Enter your mobile number"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">4-Digit PIN</ion-label>
+            <ion-input 
+              type="password" 
+              [(ngModel)]="pin" 
+              name="pin"
+              placeholder="Enter 4-digit PIN"
+              maxlength="4"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-button 
+            expand="block" 
+            type="submit" 
+            [disabled]="!loginForm.valid || isLoading"
+            class="ion-margin-top">
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading">Login</span>
+          </ion-button>
+        </form>
+
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
