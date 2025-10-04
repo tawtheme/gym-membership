@@ -101,3 +101,6 @@ android/
 
 # Ionic
 .ionic/
+
+# Angular
+.angular/cache/
