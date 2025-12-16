@@ -23,39 +23,33 @@ export class MemberDetailComponent implements OnInit {
   }
 
   loadTransactions() {
-    // For now, create mock transactions based on member data
-    // In a real app, this would fetch from a service
-    this.transactions = [];
-    
-    if (this.member.lastPaymentDate) {
-      // Create a transaction from last payment date
-      this.transactions.push({
-        id: '1',
-        memberId: this.member.id,
-        amount: this.getMembershipAmount(),
-        paymentDate: this.member.lastPaymentDate,
-        paymentMode: 'cash',
-        description: `${this.member.membershipType} membership payment`,
-        createdAt: this.member.lastPaymentDate
-      });
-    }
+    // Mock 5 transactions so the design can be previewed.
+    // In a real app, replace this with data from a service / DB.
+    const baseAmount = this.getMembershipAmount();
+    const today = new Date();
 
-    // Add initial payment if start date exists
-    if (this.member.startDate && this.member.startDate !== this.member.lastPaymentDate) {
-      this.transactions.push({
-        id: '0',
-        memberId: this.member.id,
-        amount: this.getMembershipAmount(),
-        paymentDate: this.member.startDate,
-        paymentMode: 'cash',
-        description: `Initial ${this.member.membershipType} membership payment`,
-        createdAt: this.member.startDate
-      });
-    }
+    this.transactions = Array.from({ length: 5 }).map((_, index) => {
+      const date = new Date(today);
+      // Go back one month per record
+      date.setMonth(today.getMonth() - index);
 
-    // Sort by date, newest first
-    this.transactions.sort((a, b) => 
-      new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+      const modes: PaymentTransaction['paymentMode'][] = ['cash', 'card', 'online', 'upi', 'cash'];
+      const mode = modes[index % modes.length];
+
+      return {
+        id: String(index + 1),
+        memberId: this.member.id,
+        amount: baseAmount,
+        paymentDate: date.toISOString(),
+        paymentMode: mode,
+        description: `${this.member.membershipType} membership payment #${index + 1}`,
+        createdAt: date.toISOString()
+      };
+    });
+
+    // Newest first
+    this.transactions.sort(
+      (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
     );
   }
 
