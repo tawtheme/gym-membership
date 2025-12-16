@@ -29,6 +29,16 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/jeep-sqlite/dist/jeep-sqlite",
+                "output": "./jeep-sqlite"
+              },
+              {
+                "glob": "sql-wasm.wasm",
+                "input": "node_modules/sql.js/dist",
+                "output": "./assets"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -136,7 +146,8 @@
   "cli": {
     "schematicCollections": [
       "@ionic/angular-toolkit"
-    ]
+    ],
+    "analytics": false
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {

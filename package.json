@@ -37,6 +37,7 @@
     "capacitor-sqlite": "^2.2.0",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
+    "sql.js": "^1.12.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -68,5 +69,8 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.0"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "overrides": {
+    "ora": "^5.4.1"
+  }
 }

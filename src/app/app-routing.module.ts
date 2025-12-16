@@ -16,10 +16,6 @@ const routes: Routes = [
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
   {
-    path: 'members',
-    loadChildren: () => import('./pages/members/members.module').then( m => m.MembersPageModule)
-  },
-  {
     path: 'add-member',
     loadChildren: () => import('./pages/add-member/add-member.module').then( m => m.AddMemberPageModule)
   }

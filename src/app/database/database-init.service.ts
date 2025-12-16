@@ -11,6 +11,17 @@ export class DatabaseInitService {
 
   async initializeDatabase(): Promise<SQLiteDBConnection> {
     try {
+      // Initialize web store first (required for web platform)
+      if (typeof window !== 'undefined') {
+        console.log('Initializing web store...');
+        await CapacitorSQLite.initWebStore();
+        console.log('Web store initialized successfully');
+        
+        // Wait a bit for WASM to be fully ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      console.log('Initializing database connection...');
       const sqlite = new SQLiteConnection(CapacitorSQLite);
       this.database = await sqlite.createConnection(
         DATABASE_CONFIG.name,

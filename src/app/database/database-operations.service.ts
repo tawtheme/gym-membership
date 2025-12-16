@@ -10,11 +10,21 @@ export class DatabaseOperationsService {
   private database: SQLiteDBConnection | null = null;
 
   constructor(private dbInitService: DatabaseInitService) {
-    this.initializeDatabase();
+    console.log('DatabaseOperationsService constructor called');
+    this.initializeDatabase().catch(error => {
+      console.error('Failed to initialize database in constructor:', error);
+    });
   }
 
   private async initializeDatabase() {
-    this.database = await this.dbInitService.initializeDatabase();
+    console.log('DatabaseOperationsService: Starting database initialization...');
+    try {
+      this.database = await this.dbInitService.initializeDatabase();
+      console.log('DatabaseOperationsService: Database initialized successfully');
+    } catch (error) {
+      console.error('DatabaseOperationsService: Database initialization failed:', error);
+      throw error;
+    }
   }
 
   // User operations
