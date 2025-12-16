@@ -1,0 +1,38 @@
+<div class="member-detail" *ngIf="member">
+    <header class="detail-header">
+        <button type="button" class="back-button" (click)="onClose()">
+            ←
+        </button>
+        <h2 class="detail-title">Member Details</h2>
+    </header>
+
+    <div class="detail-card">
+        <div class="detail-avatar">
+            {{ member.name ? member.name.charAt(0) : '?' }}
+        </div>
+
+        <div class="detail-main">
+            <h3 class="detail-name">{{ member.name }}</h3>
+            <p class="detail-phone">Phone: {{ member.phone }}</p>
+            <p class="detail-type">
+                Type: {{ member.membershipType | titlecase }}
+            </p>
+            <p class="detail-dates">
+                Start: {{ member.startDate | date }}<br>
+                End: {{ member.endDate | date }}
+            </p>
+            <p class="detail-status">
+                Status: {{ member.isActive ? 'Active' : 'Inactive' }}
+            </p>
+        </div>
+    </div>
+
+    <div class="detail-actions">
+        <button type="button" class="action-button edit" (click)="onEdit()">
+            Edit
+        </button>
+        <button type="button" class="action-button delete" (click)="onDelete()">
+            Delete
+        </button>
+    </div>
+</div>

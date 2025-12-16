@@ -3,6 +3,7 @@ export interface Member {
   name: string;
   phone: string;
   email?: string;
+  avatarUrl?: string;
   membershipType: 'monthly' | 'quarterly' | 'yearly';
   startDate: string;
   endDate: string;

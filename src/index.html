@@ -14,31 +14,34 @@
 
     <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
 
-  <!-- add to homescreen for ios -->
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  <!-- jeep-sqlite for web platform -->
-  <script type="module" src="assets/jeep-sqlite/jeep-sqlite.esm.js"></script>
-  <script>
-    // Wait for jeep-sqlite to be defined before Angular bootstraps
-    window.addEventListener('DOMContentLoaded', () => {
-      console.log('DOMContentLoaded - Checking jeep-sqlite...');
-      const checkJeepSqlite = setInterval(() => {
-        const jeepElement = document.querySelector('jeep-sqlite');
-        const isDefined = customElements.get('jeep-sqlite');
-        console.log('jeep-sqlite check - Element in DOM:', !!jeepElement, 'Custom element defined:', !!isDefined);
+    <!-- Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <!-- add to homescreen for ios -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    
+    <!-- jeep-sqlite for web platform -->
+    <script type="module" src="assets/jeep-sqlite/jeep-sqlite.esm.js"></script>
+    <script>
+      // Wait for jeep-sqlite to be defined before Angular bootstraps
+      window.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded - Checking jeep-sqlite...');
+        const checkJeepSqlite = setInterval(() => {
+          const jeepElement = document.querySelector('jeep-sqlite');
+          const isDefined = customElements.get('jeep-sqlite');
+          console.log('jeep-sqlite check - Element in DOM:', !!jeepElement, 'Custom element defined:', !!isDefined);
+          
+          if (jeepElement && isDefined) {
+            console.log('jeep-sqlite is ready!');
+            clearInterval(checkJeepSqlite);
+          }
+        }, 100);
         
-        if (jeepElement && isDefined) {
-          console.log('jeep-sqlite is ready!');
-          clearInterval(checkJeepSqlite);
-        }
-      }, 100);
-      
-      // Stop checking after 10 seconds
-      setTimeout(() => clearInterval(checkJeepSqlite), 10000);
-    });
-  </script>
+        // Stop checking after 10 seconds
+        setTimeout(() => clearInterval(checkJeepSqlite), 10000);
+      });
+    </script>
 </head>
 
 <body>

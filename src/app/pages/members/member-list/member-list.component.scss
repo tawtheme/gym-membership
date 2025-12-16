@@ -1,0 +1,134 @@
+.members-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--color-dark-700);
+        margin: 0;
+        padding: 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+
+        .section-count {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-neutral-600);
+        }
+    }
+
+    .section-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .section-card {
+            background: var(--color-neutral-25);
+            padding: 16px 0px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--color-neutral-200);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:active {
+                transform: scale(0.98);
+            }
+
+            .card-icon {
+                width: 65px;
+                height: 65px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                flex-shrink: 0;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+
+                .material-icons {
+                    font-size: 28px;
+                    color: var(--color-neutral-700);
+                }
+
+                &.renew-icon {
+                    background: var(--color-primary-50);
+                }
+
+                &.expired-icon {
+                    background: #fee2e2;
+                }
+
+                &.active-icon {
+                    background: #dcfce7;
+                }
+
+                &.all-icon {
+                    background: var(--color-neutral-100);
+                }
+            }
+
+            .card-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                min-width: 0;
+
+                .card-title {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: var(--color-dark-700);
+                    margin: 0;
+                }
+
+                .card-details {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    span {
+                        font-size: 13px;
+                        color: var(--color-neutral-600);
+                        line-height: 1.4;
+                    }
+                }
+            }
+
+            .card-count {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                flex-shrink: 0;
+
+                .count-avatar {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 999px;
+                    background: var(--color-primary-100);
+                    color: var(--color-primary-800);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}

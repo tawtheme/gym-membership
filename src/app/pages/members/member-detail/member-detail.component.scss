@@ -1,0 +1,95 @@
+.member-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+
+    .detail-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .back-button {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .detail-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-dark-700);
+            margin: 0;
+        }
+    }
+
+    .detail-card {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 16px;
+        background: var(--color-neutral-25);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        .detail-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 999px;
+            background: var(--color-primary-100);
+            color: var(--color-primary-800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .detail-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .detail-name {
+                font-size: 16px;
+                font-weight: 700;
+                color: var(--color-dark-700);
+                margin: 0;
+            }
+
+            .detail-phone,
+            .detail-type,
+            .detail-dates,
+            .detail-status {
+                font-size: 14px;
+                color: var(--color-neutral-700);
+                margin: 0;
+            }
+        }
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 12px;
+
+        .action-button {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .action-button.edit {
+            background: var(--ion-color-primary);
+            color: var(--ion-color-primary-contrast);
+        }
+
+        .action-button.delete {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    }
+}

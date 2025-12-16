@@ -1,93 +1,181 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Gym Members</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="addMember()">
-        <ion-icon name="add"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="members-page">
+    <!-- Member Detail View -->
+    <app-member-detail
+        *ngIf="selectedMember"
+        [member]="selectedMember"
+        (close)="closeMemberDetail()"
+        (edit)="onEditMember($event)"
+        (delete)="onDeleteMember($event)"
+    ></app-member-detail>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Gym Members</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Section Member List View -->
+    <div *ngIf="!selectedMember && selectedSection">
+        <div class="section-header">
+            <button type="button" class="back-button" (click)="closeSection()">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            <div class="section-header-title">{{ getSectionTitle() }}</div>
+        </div>
+        <app-member-list
+            [title]="getSectionTitle()"
+            [members]="getSectionMembers()"
+            [variant]="selectedSection"
+            (memberClick)="viewMember($event)"
+        ></app-member-list>
+    </div>
 
-  <!-- Search Bar -->
-  <ion-searchbar 
-    [(ngModel)]="searchTerm" 
-    (ionInput)="onSearchChange($event)"
-    placeholder="Search members..."
-    show-clear-button="focus">
-  </ion-searchbar>
+    <!-- Main View with Section Summary Cards -->
+    <div *ngIf="!selectedMember && !selectedSection">
+        <!-- Search Bar -->
+        <div class="members-search">
+            <input
+                type="search"
+                class="members-search-input"
+                [(ngModel)]="searchTerm"
+                (input)="onSearchChange($event)"
+                placeholder="Search members..."
+            />
+        </div>
 
-  <!-- Filter Buttons -->
-  <ion-segment [(ngModel)]="filterType" (ionChange)="onFilterChange()">
-    <ion-segment-button value="all">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="active">
-      <ion-label>Active</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="expiring">
-      <ion-label>Expiring</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+        <!-- Section Summary Cards -->
+        <div class="section-cards-container">
+            <!-- Pending Renew Card -->
+            <div class="section-summary-card" (click)="viewSection('renew')" *ngIf="getRenewMembers().length > 0">
+                <div class="card-icon renew-icon">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="card-content-container">
+                    <div class="card-content">
+                        <div class="card-title">Pending Renew</div>
+                        <div class="card-info">
+                            <span>Members: {{ getRenewMembers().length }}</span>
+                        </div>
+                    </div>
+                    <div class="card-avatars">
+                        <div
+                            class="avatar-stack"
+                            *ngFor="let member of getSectionAvatars(getRenewMembers()); let i = index"
+                            [style.z-index]="10 - i"
+                            [style.margin-left]="i > 0 ? '-8px' : '0'"
+                        >
+                            <div class="avatar-circle">
+                                {{ member.name ? member.name.charAt(0) : '?' }}
+                            </div>
+                        </div>
+                        <div class="avatar-count" *ngIf="getRemainingCount(getRenewMembers()) > 0">
+                            {{ getRemainingCount(getRenewMembers()) }}+
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Members List -->
-  <ion-list>
-    <ion-item-sliding *ngFor="let member of filteredMembers">
-      <ion-item>
-        <ion-avatar slot="start">
-          <ion-icon name="person" size="large"></ion-icon>
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ member.name }}</h2>
-          <p>{{ member.phone }}</p>
-          <p>
-            <ion-badge [color]="getMembershipBadgeColor(member.membershipType)">
-              {{ member.membershipType | titlecase }}
-            </ion-badge>
-            <ion-badge [color]="getStatusBadgeColor(member.isActive, member.endDate)">
-              {{ getStatusText(member.isActive, member.endDate) }}
-            </ion-badge>
-          </p>
-          <p>Expires: {{ formatDate(member.endDate) }}</p>
-        </ion-label>
-      </ion-item>
-      
-      <ion-item-options side="end">
-        <ion-item-option color="primary" (click)="editMember(member)">
-          <ion-icon name="create" slot="icon-only"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="success" (click)="sendReminder(member)">
-          <ion-icon name="notifications" slot="icon-only"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="deleteMember(member)">
-          <ion-icon name="trash" slot="icon-only"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+            <!-- Active Card -->
+            <div class="section-summary-card" (click)="viewSection('active')" *ngIf="getActiveMembers().length > 0">
+                <div class="card-icon active-icon">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="card-content-container">
+                    <div class="card-content">
+                        <div class="card-title">Active</div>
+                        <div class="card-info">
+                            <span>Members: {{ getActiveMembers().length }}</span>
+                        </div>
+                    </div>
+                    <div class="card-avatars">
+                        <div
+                            class="avatar-stack"
+                            *ngFor="let member of getSectionAvatars(getActiveMembers()); let i = index"
+                            [style.z-index]="10 - i"
+                            [style.margin-left]="i > 0 ? '-8px' : '0'"
+                        >
+                            <div class="avatar-circle">
+                                {{ member.name ? member.name.charAt(0) : '?' }}
+                            </div>
+                        </div>
+                        <div class="avatar-count" *ngIf="getRemainingCount(getActiveMembers()) > 0">
+                            {{ getRemainingCount(getActiveMembers()) }}+
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Empty State -->
-  <div *ngIf="filteredMembers.length === 0" class="empty-state">
-    <ion-icon name="people-outline" size="large"></ion-icon>
-    <h2>No Members Found</h2>
-    <p>Start by adding your first gym member</p>
-    <ion-button (click)="addMember()" fill="outline">
-      <ion-icon name="add" slot="start"></ion-icon>
-      Add Member
-    </ion-button>
-  </div>
+            <!-- Expired Card -->
+            <div class="section-summary-card" (click)="viewSection('expired')" *ngIf="getExpiredMembers().length > 0">
+                <div class="card-icon expired-icon">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="card-content-container">
+                    <div class="card-content">
+                        <div class="card-title">Expired</div>
+                        <div class="card-info">
+                            <span>Members: {{ getExpiredMembers().length }}</span>
+                        </div>
+                    </div>
+                    <div class="card-avatars">
+                        <div
+                            class="avatar-stack"
+                            *ngFor="let member of getSectionAvatars(getExpiredMembers()); let i = index"
+                            [style.z-index]="10 - i"
+                            [style.margin-left]="i > 0 ? '-8px' : '0'"
+                        >
+                            <div class="avatar-circle">
+                                {{ member.name ? member.name.charAt(0) : '?' }}
+                            </div>
+                        </div>
+                        <div class="avatar-count" *ngIf="getRemainingCount(getExpiredMembers()) > 0">
+                            {{ getRemainingCount(getExpiredMembers()) }}+
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Floating Action Button -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addMember()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-</ion-content>
+            <!-- All Member Card -->
+            <div class="section-summary-card" (click)="viewSection('all')" *ngIf="getAllMembers().length > 0">
+                <div class="card-icon all-icon">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="card-content-container">
+                    <div class="card-content">
+                        <div class="card-title">All Member</div>
+                        <div class="card-info">
+                            <span>Members: {{ getAllMembers().length }}</span>
+                        </div>
+                    </div>
+                    <div class="card-avatars">
+                        <div
+                            class="avatar-stack"
+                            *ngFor="let member of getSectionAvatars(getAllMembers()); let i = index"
+                            [style.z-index]="10 - i"
+                            [style.margin-left]="i > 0 ? '-8px' : '0'"
+                        >
+                            <div class="avatar-circle">
+                                {{ member.name ? member.name.charAt(0) : '?' }}
+                            </div>
+                        </div>
+                        <div class="avatar-count" *ngIf="getRemainingCount(getAllMembers()) > 0">
+                            {{ getRemainingCount(getAllMembers()) }}+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="getAllMembers().length === 0" class="members-empty">
+            <h2>No Members Found</h2>
+            <p>Start by adding your first gym member</p>
+            <button type="button" class="members-empty-button" (click)="addMember()">
+                Add Member
+            </button>
+        </div>
+
+        <!-- Floating Action Button -->
+        <button
+            type="button"
+            class="members-fab"
+            (click)="addMember()"
+        >
+            <span class="material-icons">add</span>
+        </button>
+    </div>
+</div>

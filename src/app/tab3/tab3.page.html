@@ -1,164 +1,151 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Backup & Restore</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Backup & Restore</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <ion-header collapse="condense">
+        <ion-toolbar class="backup-toolbar">
+            <ion-title size="large">Settings</ion-title>
+        </ion-toolbar>
+    </ion-header>
 
-  <!-- Backup Settings -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Backup Settings</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label>Enable Automatic Backup</ion-label>
-        <ion-toggle 
-          [(ngModel)]="backupSettings.isEnabled" 
-          (ionChange)="onBackupToggleChange()"
-          color="success">
-        </ion-toggle>
-      </ion-item>
+    <div class="settings-page">
+        <!-- Account -->
+        <section class="settings-section">
+            <ion-label class="section-heading">Account</ion-label>
 
-      <ion-item *ngIf="backupSettings.isEnabled">
-        <ion-label position="stacked">Backup Frequency</ion-label>
-        <ion-select 
-          [(ngModel)]="backupSettings.frequency" 
-          (ionChange)="onFrequencyChange()"
-          placeholder="Select frequency">
-          <ion-select-option value="daily">Daily</ion-select-option>
-          <ion-select-option value="weekly">Weekly</ion-select-option>
-          <ion-select-option value="monthly">Monthly</ion-select-option>
-          <ion-select-option value="yearly">Yearly</ion-select-option>
-        </ion-select>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+            <div class="settings-card">
+                <button type="button" class="settings-row">
+                    <div class="row-icon avatar-icon">
+                        <ion-icon name="person-circle"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">My Account</div>
+                        <div class="row-subtitle">Name, address, phone, email</div>
+                    </div>
+                    <ion-icon name="chevron-forward" class="row-chevron"></ion-icon>
+                </button>
+            </div>
+        </section>
 
-  <!-- Manual Backup -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Manual Backup</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Create a backup of all your gym data. This backup can be restored later or shared with other devices.</p>
-      
-      <ion-button 
-        expand="block" 
-        (click)="createBackup()" 
-        [disabled]="isCreatingBackup"
-        class="ion-margin-top">
-        <ion-spinner *ngIf="isCreatingBackup" name="crescent"></ion-spinner>
-        <ion-icon *ngIf="!isCreatingBackup" name="cloud-upload" slot="start"></ion-icon>
-        <span *ngIf="!isCreatingBackup">Create Backup</span>
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+        <!-- Notifications -->
+        <section class="settings-section">
+            <ion-label class="section-heading">Preferences</ion-label>
 
-  <!-- Backup History -->
-  <ion-card *ngIf="lastBackupDate">
-    <ion-card-header>
-      <ion-card-title>Last Backup</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-icon name="time" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Last Backup Date</h3>
-          <p>{{ formatDate(lastBackupDate) }}</p>
-        </ion-label>
-      </ion-item>
-      
-      <ion-item>
-        <ion-icon name="calendar" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Next Backup</h3>
-          <p>{{ nextBackupDate ? formatDate(nextBackupDate) : 'Not scheduled' }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+            <div class="settings-card">
+                <div class="settings-row">
+                    <div class="row-icon">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Notifications</div>
+                        <div class="row-subtitle">Receive important reminders and alerts</div>
+                    </div>
+                    <ion-toggle [(ngModel)]="notificationsEnabled" class="toggle-control"></ion-toggle>
+                </div>
+            </div>
+        </section>
 
-  <!-- Restore Backup -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Restore Backup</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Restore your gym data from a previously created backup file.</p>
-      
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        (click)="restoreBackup()" 
-        [disabled]="isRestoringBackup"
-        class="ion-margin-top">
-        <ion-spinner *ngIf="isRestoringBackup" name="crescent"></ion-spinner>
-        <ion-icon *ngIf="!isRestoringBackup" name="cloud-download" slot="start"></ion-icon>
-        <span *ngIf="!isRestoringBackup">Restore from File</span>
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+        <!-- Backups -->
+        <section class="settings-section">
+            <ion-label class="section-heading">Backups</ion-label>
 
-  <!-- Database Info -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Database Information</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>View information about the local SQLite database file.</p>
-      
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        (click)="showDatabaseInfo()" 
-        class="ion-margin-top">
-        <ion-icon name="information-circle" slot="start"></ion-icon>
-        Show Database Info
-      </ion-button>
+            <div class="settings-card">
+                <div class="settings-row">
+                    <div class="row-icon">
+                        <ion-icon name="cloud-done-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Enable Automatic Backup</div>
+                        <div class="row-subtitle">Back up your data on a schedule</div>
+                    </div>
+                    <ion-toggle [(ngModel)]="backupSettings.isEnabled" (ionChange)="onBackupToggleChange()"
+                        class="toggle-control"></ion-toggle>
+                </div>
 
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        (click)="inspectDatabase()" 
-        class="ion-margin-top">
-        <ion-icon name="eye" slot="start"></ion-icon>
-        Inspect Database Tables
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+                <div class="settings-row nested" *ngIf="backupSettings.isEnabled">
+                    <div class="row-main">
+                        <div class="row-title small">Backup Frequency</div>
+                    </div>
+                    <ion-select interface="popover" class="select-control" [(ngModel)]="backupSettings.frequency"
+                        (ionChange)="onFrequencyChange()" placeholder="Select">
+                        <ion-select-option value="daily">Daily</ion-select-option>
+                        <ion-select-option value="weekly">Weekly</ion-select-option>
+                        <ion-select-option value="monthly">Monthly</ion-select-option>
+                        <ion-select-option value="yearly">Yearly</ion-select-option>
+                    </ion-select>
+                </div>
 
-  <!-- Export/Import -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Export/Import Data</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Export your data to share or import data from another device.</p>
-      
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        (click)="exportData()" 
-        class="ion-margin-top">
-        <ion-icon name="download" slot="start"></ion-icon>
-        Export Data
-      </ion-button>
-      
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        (click)="importData()" 
-        class="ion-margin-top">
-        <ion-icon name="upload" slot="start"></ion-icon>
-        Import Data
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+                <button type="button" class="settings-row" (click)="createBackup()" [disabled]="isCreatingBackup">
+                    <div class="row-icon">
+                        <ion-icon name="cloud-upload-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Manual Backup</div>
+                        <div class="row-subtitle">
+                            {{ isCreatingBackup ? 'Creating backup…' : 'Create a backup file now' }}
+                        </div>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-row" (click)="restoreBackup()" [disabled]="isRestoringBackup">
+                    <div class="row-icon">
+                        <ion-icon name="cloud-download-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Restore Backup</div>
+                        <div class="row-subtitle">
+                            {{ isRestoringBackup ? 'Restoring backup…' : 'Restore data from a backup file' }}
+                        </div>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-row" (click)="exportData()">
+                    <div class="row-icon">
+                        <ion-icon name="download-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Export / Import Data</div>
+                        <div class="row-subtitle">Export your data or import from file</div>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Membership Fee Plan -->
+        <section class="settings-section">
+            <ion-label class="section-heading">Membership Fee Plan</ion-label>
+
+            <div class="settings-card">
+                <div class="settings-row">
+                    <div class="row-icon">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Monthly Fee</div>
+                        <div class="row-subtitle">Configure monthly membership fee</div>
+                    </div>
+                    <ion-icon name="chevron-forward" class="row-chevron"></ion-icon>
+                </div>
+
+                <div class="settings-row">
+                    <div class="row-icon">
+                        <ion-icon name="repeat-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Quarterly Fee</div>
+                        <div class="row-subtitle">Configure quarterly membership fee</div>
+                    </div>
+                    <ion-icon name="chevron-forward" class="row-chevron"></ion-icon>
+                </div>
+
+                <div class="settings-row">
+                    <div class="row-icon">
+                        <ion-icon name="sparkles-outline"></ion-icon>
+                    </div>
+                    <div class="row-main">
+                        <div class="row-title">Yearly Fee</div>
+                        <div class="row-subtitle">Configure yearly membership fee</div>
+                    </div>
+                    <ion-icon name="chevron-forward" class="row-chevron"></ion-icon>
+                </div>
+            </div>
+        </section>
+    </div>
 </ion-content>

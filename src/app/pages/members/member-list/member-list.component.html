@@ -1,0 +1,22 @@
+<section class="members-section" *ngIf="members && members.length">
+    <div class="section-cards">
+        <div class="section-card" *ngFor="let member of members" (click)="onMemberClick(member)">
+            <div class="card-icon" [ngClass]="variant + '-icon'">
+                <ng-container *ngIf="member.avatarUrl; else defaultAvatar">
+                    <img [src]="member.avatarUrl" alt="{{ member.name }}" />
+                </ng-container>
+                <ng-template #defaultAvatar>
+                    <span class="material-icons">person</span>
+                </ng-template>
+            </div>
+
+            <div class="card-content">
+                <div class="card-title">{{ member.name }}</div>
+                <div class="card-details">
+                    <span>Phone: {{ member.phone }}</span>
+                    <span>Expires: {{ member.endDate | date }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -15,13 +15,15 @@ export class MembersPage implements OnInit {
   filteredMembers: Member[] = [];
   searchTerm: string = '';
   filterType: string = 'all';
+  selectedMember: Member | null = null;
+  selectedSection: 'renew' | 'expired' | 'active' | 'all' | null = null;
 
   constructor(
     private memberService: MemberService,
     private router: Router,
     private toastController: ToastController,
     private alertController: AlertController
-  ) {}
+  ) { }
 
   async ngOnInit() {
     await this.loadMembers();
@@ -42,7 +44,7 @@ export class MembersPage implements OnInit {
   }
 
   onSearchChange(event: any) {
-    this.searchTerm = event.detail.value;
+    this.searchTerm = event.target.value;
     this.applyFilters();
   }
 
@@ -51,6 +53,41 @@ export class MembersPage implements OnInit {
   }
 
   applyFilters() {
+    this.filteredMembers = [...this.members];
+  }
+
+  getRenewMembers(): Member[] {
+    const now = new Date();
+    const sevenDaysFromNow = new Date(now);
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+
+    return this.getFilteredMembers().filter(member => {
+      const endDate = new Date(member.endDate);
+      return member.isActive && endDate >= now && endDate <= sevenDaysFromNow;
+    });
+  }
+
+  getExpiredMembers(): Member[] {
+    const now = new Date();
+    return this.getFilteredMembers().filter(member => {
+      const endDate = new Date(member.endDate);
+      return endDate < now;
+    });
+  }
+
+  getActiveMembers(): Member[] {
+    const now = new Date();
+    return this.getFilteredMembers().filter(member => {
+      const endDate = new Date(member.endDate);
+      return member.isActive && endDate >= now;
+    });
+  }
+
+  getAllMembers(): Member[] {
+    return this.getFilteredMembers();
+  }
+
+  private getFilteredMembers(): Member[] {
     let filtered = [...this.members];
 
     // Apply search filter
@@ -61,32 +98,84 @@ export class MembersPage implements OnInit {
       );
     }
 
-    // Apply type filter
-    switch (this.filterType) {
-      case 'active':
-        filtered = filtered.filter(member => member.isActive);
-        break;
-      case 'expiring':
-        const sevenDaysFromNow = new Date();
-        sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-        filtered = filtered.filter(member => {
-          const endDate = new Date(member.endDate);
-          return endDate <= sevenDaysFromNow && member.isActive;
-        });
-        break;
-    }
+    return filtered;
+  }
 
-    this.filteredMembers = filtered;
+  getSectionCount(members: Member[]): number {
+    return members.length;
   }
 
   addMember() {
     this.router.navigate(['/add-member']);
   }
 
+  viewMember(member: Member) {
+    this.selectedMember = member;
+  }
+
   editMember(member: Member) {
-    this.router.navigate(['/add-member'], { 
-      queryParams: { id: member.id, edit: true } 
+    this.router.navigate(['/add-member'], {
+      queryParams: { id: member.id, edit: true }
     });
+  }
+
+  closeMemberDetail() {
+    this.selectedMember = null;
+  }
+
+  viewSection(section: 'renew' | 'expired' | 'active' | 'all') {
+    this.selectedSection = section;
+  }
+
+  closeSection() {
+    this.selectedSection = null;
+  }
+
+  getSectionMembers(): Member[] {
+    switch (this.selectedSection) {
+      case 'renew':
+        return this.getRenewMembers();
+      case 'active':
+        return this.getActiveMembers();
+      case 'expired':
+        return this.getExpiredMembers();
+      case 'all':
+        return this.getAllMembers();
+      default:
+        return [];
+    }
+  }
+
+  getSectionTitle(): string {
+    switch (this.selectedSection) {
+      case 'renew':
+        return 'Pending Renew';
+      case 'active':
+        return 'Active';
+      case 'expired':
+        return 'Expired';
+      case 'all':
+        return 'All Member';
+      default:
+        return '';
+    }
+  }
+
+  getSectionAvatars(members: Member[]): Member[] {
+    return members.slice(0, 3);
+  }
+
+  getRemainingCount(members: Member[]): number {
+    return Math.max(0, members.length - 3);
+  }
+
+  onEditMember(member: Member) {
+    this.editMember(member);
+  }
+
+  onDeleteMember(member: Member) {
+    this.deleteMember(member);
+    this.selectedMember = null;
   }
 
   async sendReminder(member: Member) {
@@ -159,11 +248,11 @@ export class MembersPage implements OnInit {
 
   getStatusBadgeColor(isActive: boolean, endDate: string): string {
     if (!isActive) return 'danger';
-    
+
     const end = new Date(endDate);
     const now = new Date();
     const daysUntilExpiry = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntilExpiry < 0) return 'danger';
     if (daysUntilExpiry <= 7) return 'warning';
     return 'success';
@@ -171,11 +260,11 @@ export class MembersPage implements OnInit {
 
   getStatusText(isActive: boolean, endDate: string): string {
     if (!isActive) return 'Inactive';
-    
+
     const end = new Date(endDate);
     const now = new Date();
     const daysUntilExpiry = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntilExpiry < 0) return 'Expired';
     if (daysUntilExpiry <= 7) return 'Expiring Soon';
     return 'Active';

@@ -8,11 +8,14 @@ import { TABLE_NAMES } from './database.config';
 })
 export class DatabaseOperationsService {
   private database: SQLiteDBConnection | null = null;
+  private initPromise: Promise<void> | null = null;
 
   constructor(private dbInitService: DatabaseInitService) {
     console.log('DatabaseOperationsService constructor called');
-    this.initializeDatabase().catch(error => {
+    // Kick off initialization, but don't block constructor
+    this.initPromise = this.initializeDatabase().catch(error => {
       console.error('Failed to initialize database in constructor:', error);
+      this.initPromise = null;
     });
   }
 
@@ -27,8 +30,25 @@ export class DatabaseOperationsService {
     }
   }
 
+  private async ensureDatabaseInitialized(): Promise<void> {
+    if (this.database) {
+      return;
+    }
+
+    if (!this.initPromise) {
+      this.initPromise = this.initializeDatabase().catch(error => {
+        console.error('DatabaseOperationsService: Database initialization failed in ensureDatabaseInitialized:', error);
+        this.initPromise = null;
+        throw error;
+      });
+    }
+
+    await this.initPromise;
+  }
+
   // User operations
   async authenticateUser(mobileNumber: string, pin: string): Promise<boolean> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const result = await this.database.query(
@@ -40,6 +60,7 @@ export class DatabaseOperationsService {
   }
 
   async addUser(mobileNumber: string, pin: string): Promise<boolean> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     try {
@@ -57,6 +78,7 @@ export class DatabaseOperationsService {
 
   // Member operations
   async addMember(member: any): Promise<string> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const id = this.generateId();
@@ -71,6 +93,7 @@ export class DatabaseOperationsService {
   }
 
   async getAllMembers(): Promise<any[]> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const result = await this.database.query(`SELECT * FROM ${TABLE_NAMES.MEMBERS} ORDER BY created_at DESC`);
@@ -78,6 +101,7 @@ export class DatabaseOperationsService {
   }
 
   async getMember(id: string): Promise<any | null> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const result = await this.database.query(`SELECT * FROM ${TABLE_NAMES.MEMBERS} WHERE id = ?`, [id]);
@@ -88,6 +112,7 @@ export class DatabaseOperationsService {
   }
 
   async updateMember(id: string, updates: any): Promise<boolean> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const setClause = [];
@@ -115,6 +140,7 @@ export class DatabaseOperationsService {
   }
 
   async deleteMember(id: string): Promise<boolean> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     await this.database.run(`DELETE FROM ${TABLE_NAMES.MEMBERS} WHERE id = ?`, [id]);
@@ -124,6 +150,7 @@ export class DatabaseOperationsService {
 
   // Reminder operations
   async addReminder(reminder: any): Promise<string> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const id = this.generateId();
@@ -138,6 +165,7 @@ export class DatabaseOperationsService {
   }
 
   async getAllReminders(): Promise<any[]> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const result = await this.database.query(`SELECT * FROM ${TABLE_NAMES.REMINDERS} ORDER BY scheduled_date ASC`);
@@ -146,6 +174,7 @@ export class DatabaseOperationsService {
 
   // Backup operations
   async getBackupSettings(): Promise<any> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     const result = await this.database.query(`SELECT * FROM ${TABLE_NAMES.BACKUP_SETTINGS} LIMIT 1`);
@@ -163,6 +192,7 @@ export class DatabaseOperationsService {
   }
 
   async updateBackupSettings(settings: any): Promise<void> {
+    await this.ensureDatabaseInitialized();
     if (!this.database) throw new Error('Database not initialized');
     
     await this.database.run(`

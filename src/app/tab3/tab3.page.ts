@@ -22,6 +22,7 @@ export class Tab3Page implements OnInit {
   nextBackupDate: string | null = null;
   isCreatingBackup: boolean = false;
   isRestoringBackup: boolean = false;
+  notificationsEnabled = true;
 
   constructor(
     private storageService: StorageService,
