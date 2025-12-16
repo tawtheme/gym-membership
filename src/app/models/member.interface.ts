@@ -32,3 +32,13 @@ export interface BackupSettings {
   nextBackup?: string;
   isEnabled: boolean;
 }
+
+export interface PaymentTransaction {
+  id: string;
+  memberId: string;
+  amount: number;
+  paymentDate: string;
+  paymentMode: 'cash' | 'card' | 'online' | 'upi';
+  description?: string;
+  createdAt: string;
+}

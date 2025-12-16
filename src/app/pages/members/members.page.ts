@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../../services/member';
 import { Member } from '../../models/member.interface';
+import { MemberDetailComponent } from './member-detail/member-detail.component';
 
 @Component({
   selector: 'app-members',
@@ -15,14 +16,14 @@ export class MembersPage implements OnInit {
   filteredMembers: Member[] = [];
   searchTerm: string = '';
   filterType: string = 'all';
-  selectedMember: Member | null = null;
   selectedSection: 'renew' | 'expired' | 'active' | 'all' | null = null;
 
   constructor(
     private memberService: MemberService,
     private router: Router,
     private toastController: ToastController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private modalCtrl: ModalController
   ) { }
 
   async ngOnInit() {
@@ -109,18 +110,20 @@ export class MembersPage implements OnInit {
     this.router.navigate(['/add-member']);
   }
 
-  viewMember(member: Member) {
-    this.selectedMember = member;
+  async viewMember(member: Member) {
+    const modal = await this.modalCtrl.create({
+      component: MemberDetailComponent,
+      componentProps: { member },
+      cssClass: 'member-detail-modal'
+    });
+
+    await modal.present();
   }
 
   editMember(member: Member) {
     this.router.navigate(['/add-member'], {
       queryParams: { id: member.id, edit: true }
     });
-  }
-
-  closeMemberDetail() {
-    this.selectedMember = null;
   }
 
   viewSection(section: 'renew' | 'expired' | 'active' | 'all') {
@@ -167,15 +170,6 @@ export class MembersPage implements OnInit {
 
   getRemainingCount(members: Member[]): number {
     return Math.max(0, members.length - 3);
-  }
-
-  onEditMember(member: Member) {
-    this.editMember(member);
-  }
-
-  onDeleteMember(member: Member) {
-    this.deleteMember(member);
-    this.selectedMember = null;
   }
 
   async sendReminder(member: Member) {

@@ -1,15 +1,6 @@
 <div class="members-page">
-    <!-- Member Detail View -->
-    <app-member-detail
-        *ngIf="selectedMember"
-        [member]="selectedMember"
-        (close)="closeMemberDetail()"
-        (edit)="onEditMember($event)"
-        (delete)="onDeleteMember($event)"
-    ></app-member-detail>
-
     <!-- Section Member List View -->
-    <div *ngIf="!selectedMember && selectedSection">
+    <div *ngIf="selectedSection">
         <div class="section-header">
             <button type="button" class="back-button" (click)="closeSection()">
                 <span class="material-icons">arrow_back</span>
@@ -25,7 +16,7 @@
     </div>
 
     <!-- Main View with Section Summary Cards -->
-    <div *ngIf="!selectedMember && !selectedSection">
+    <div *ngIf="!selectedSection">
         <!-- Search Bar -->
         <div class="members-search">
             <input
