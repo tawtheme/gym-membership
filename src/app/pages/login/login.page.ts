@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { AuthService } from '../../services/auth';
+import { SnackbarService } from '../../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-login',
@@ -17,8 +18,8 @@ export class LoginPage implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toastController: ToastController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private snackbar: SnackbarService
   ) {}
 
   ngOnInit() {
@@ -68,13 +69,7 @@ export class LoginPage implements OnInit {
   }
 
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 3000);
   }
 }

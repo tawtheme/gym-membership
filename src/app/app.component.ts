@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SnackbarService, SnackbarState } from './shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-root',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
   standalone: false,
 })
 export class AppComponent implements OnInit {
-  constructor() {}
+  snackbarState: SnackbarState | null = null;
+
+  constructor(private snackbarService: SnackbarService) {}
 
   ngOnInit() {
+    this.snackbarService.state$.subscribe((state) => {
+      this.snackbarState = state;
+    });
+
     // Check if jeep-sqlite element is in the DOM
     const jeepElement = document.querySelector('jeep-sqlite');
     const isDefined = customElements.get('jeep-sqlite');

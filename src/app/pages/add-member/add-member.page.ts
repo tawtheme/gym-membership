@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { MemberService } from '../../services/member';
 import { Member } from '../../models/member.interface';
+import { SnackbarService } from '../../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-add-member',
@@ -32,7 +33,7 @@ export class AddMemberPage implements OnInit {
   constructor(
     private memberService: MemberService,
     private modalController: ModalController,
-    private toastController: ToastController
+    private snackbar: SnackbarService
   ) {}
 
   async ngOnInit() {
@@ -170,13 +171,7 @@ export class AddMemberPage implements OnInit {
     }
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 3000);
   }
 }

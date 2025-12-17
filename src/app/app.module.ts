@@ -8,6 +8,8 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SharedModule } from './shared/shared.module';
+import { SnackbarComponent } from './shared/snackbar/snackbar.component';
 import { AuthService } from './services/auth';
 import { StorageService } from './services/storage';
 import { MemberService } from './services/member';
@@ -22,7 +24,9 @@ import { DatabaseInitService, DatabaseOperationsService } from './database';
     HttpClientModule,
     IonicModule.forRoot(), 
     IonicStorageModule.forRoot(),
-    AppRoutingModule
+    AppRoutingModule,
+    SharedModule,
+    SnackbarComponent
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

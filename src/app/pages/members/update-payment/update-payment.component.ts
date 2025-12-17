@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Member, PaymentTransaction } from '../../../models/member.interface';
 import { DataService } from '../../../services/data.service';
 import { MemberService } from '../../../services/member';
+import { SnackbarService } from '../../../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-update-payment',
@@ -26,9 +27,9 @@ export class UpdatePaymentComponent implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private toastController: ToastController,
     private dataService: DataService,
-    private memberService: MemberService
+    private memberService: MemberService,
+    private snackbar: SnackbarService
   ) { }
 
   ngOnInit() {
@@ -107,13 +108,7 @@ export class UpdatePaymentComponent implements OnInit {
     }
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      color,
-      position: 'bottom'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 2000);
   }
 }

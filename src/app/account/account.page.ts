@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ToastController, AlertController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { AuthService } from '../services/auth';
 import { StorageService } from '../services/storage';
+import { SnackbarService } from '../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-account',
@@ -23,8 +24,8 @@ export class AccountPage implements OnInit {
   constructor(
     private authService: AuthService,
     private storageService: StorageService,
-    private toastController: ToastController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private snackbar: SnackbarService
   ) {}
 
   async ngOnInit() {
@@ -137,13 +138,8 @@ export class AccountPage implements OnInit {
     await alert.present();
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    // keep long duration for design testing on account page
+    this.snackbar.show(message, color as any, 180000);
   }
 }

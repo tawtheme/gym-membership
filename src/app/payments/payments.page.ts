@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ToastController, ModalController, AlertController } from '@ionic/angular';
+import { ModalController, AlertController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { PaymentTransaction, Member } from '../models/member.interface';
 import { UpdatePaymentComponent } from '../pages/members/update-payment/update-payment.component';
+import { SnackbarService } from '../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-payments',
@@ -12,12 +13,17 @@ import { UpdatePaymentComponent } from '../pages/members/update-payment/update-p
 })
 export class PaymentsPage implements OnInit {
   allTransactions: PaymentTransaction[] = [];
+  membersForSelection: Member[] = [];
+  filteredMembersForSelection: Member[] = [];
+  selectedMemberId: string | null = null;
+  isMemberSelectOpen = false;
+  memberSearchQuery: string = '';
 
   constructor(
-    private toastController: ToastController,
     private dataService: DataService,
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private snackbar: SnackbarService
   ) {}
 
   async ngOnInit() {
@@ -47,37 +53,11 @@ export class PaymentsPage implements OnInit {
         return;
       }
 
-      // Create alert with member selection
-      const inputs = members.map(member => ({
-        type: 'radio' as const,
-        label: `${member.name} (${member.membershipType})`,
-        value: member.id,
-        checked: false
-      }));
-
-      const alert = await this.alertController.create({
-        header: 'Select Member',
-        inputs: inputs,
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'Select',
-            handler: async (memberId) => {
-              if (memberId) {
-                const selectedMember = members.find(m => m.id === memberId);
-                if (selectedMember) {
-                  await this.openUpdatePaymentModal(selectedMember);
-                }
-              }
-            }
-          }
-        ]
-      });
-
-      await alert.present();
+      this.membersForSelection = members;
+      this.filteredMembersForSelection = [...members];
+      this.selectedMemberId = null;
+      this.memberSearchQuery = '';
+      this.isMemberSelectOpen = true;
     } catch (error) {
       console.error('Error opening add payment:', error);
       this.showToast('Error loading members. Please try again.', 'danger');
@@ -102,13 +82,28 @@ export class PaymentsPage implements OnInit {
     }
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  closeMemberSelect() {
+    this.isMemberSelectOpen = false;
+  }
+
+  onMemberSearchChange(event: any) {
+    const query = (event.target?.value || '').toLowerCase();
+    this.memberSearchQuery = query;
+    this.filteredMembersForSelection = this.membersForSelection.filter(member =>
+      member.name.toLowerCase().includes(query) ||
+      member.membershipType.toLowerCase().includes(query)
+    );
+  }
+
+  async onMemberSelected(memberId: string) {
+    this.isMemberSelectOpen = false;
+    const selectedMember = this.membersForSelection.find(m => m.id === memberId);
+    if (selectedMember) {
+      await this.openUpdatePaymentModal(selectedMember);
+    }
+  }
+
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 3000);
   }
 }

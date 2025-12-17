@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController, AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../../services/member';
 import { Member, Reminder } from '../../models/member.interface';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { DataService } from '../../services/data.service';
+import { SnackbarService } from '../../shared/snackbar/snackbar.service';
 import { AddMemberPage } from '../add-member/add-member.page';
 
 @Component({
@@ -24,10 +25,10 @@ export class MembersPage implements OnInit {
   constructor(
     private memberService: MemberService,
     private router: Router,
-    private toastController: ToastController,
     private alertController: AlertController,
     private modalCtrl: ModalController,
-    private dataService: DataService
+    private dataService: DataService,
+    private snackbar: SnackbarService
   ) { }
 
   async ngOnInit() {
@@ -349,13 +350,7 @@ export class MembersPage implements OnInit {
     return date.toLocaleDateString();
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 3000);
   }
 }

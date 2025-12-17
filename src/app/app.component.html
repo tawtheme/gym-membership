@@ -1,3 +1,8 @@
 <ion-app>
+  <app-snackbar
+    [message]="snackbarState?.message ?? null"
+    [type]="snackbarState?.type || 'info'"
+    [visible]="snackbarState?.visible || false"
+  ></app-snackbar>
   <ion-router-outlet></ion-router-outlet>
 </ion-app>

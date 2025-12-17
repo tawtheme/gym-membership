@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ToastController, AlertController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { MemberService } from '../services/member';
 import { Reminder } from '../models/member.interface';
+import { SnackbarService } from '../shared/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-reminders',
@@ -16,8 +17,8 @@ export class RemindersPage implements OnInit {
 
   constructor(
     private memberService: MemberService,
-    private toastController: ToastController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private snackbar: SnackbarService
   ) {}
 
   async ngOnInit() {
@@ -191,13 +192,7 @@ export class RemindersPage implements OnInit {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   }
 
-  private async showToast(message: string, color: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  private showToast(message: string, color: string) {
+    this.snackbar.show(message, color as any, 3000);
   }
 }

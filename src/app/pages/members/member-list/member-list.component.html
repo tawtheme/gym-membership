@@ -48,6 +48,6 @@
         *ngIf="filteredMembers && filteredMembers.length === 0"
         icon="search_off"
         title="No Members Found"
-        [message]="searchQuery ? 'No members found matching \"' + searchQuery + '\"' : 'No members available in this section'"
-    ></app-no-data-found>
+        [message]="searchQuery ? 'No members found matching ' + searchQuery : 'No members available in this section'">
+    </app-no-data-found>
 </section>
