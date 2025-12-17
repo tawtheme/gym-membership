@@ -10,5 +10,6 @@ export const TABLE_NAMES = {
   USERS: 'users',
   MEMBERS: 'members',
   REMINDERS: 'reminders',
-  BACKUP_SETTINGS: 'backup_settings'
+  BACKUP_SETTINGS: 'backup_settings',
+  PAYMENT_TRANSACTIONS: 'payment_transactions'
 } as const;

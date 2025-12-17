@@ -20,8 +20,8 @@ export class AddMemberPage implements OnInit {
     email: '',
     address: '',
     membershipType: 'monthly',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+    startDate: undefined,
+    endDate: undefined,
     isActive: true,
     notes: ''
   };
@@ -29,6 +29,8 @@ export class AddMemberPage implements OnInit {
   isEditMode: boolean = false;
   isLoading: boolean = false;
   photoPreview: string | null = null;
+  isStartDatePickerOpen = false;
+  startDatePickerValue: string | null = null;
 
   constructor(
     private memberService: MemberService,
@@ -40,12 +42,12 @@ export class AddMemberPage implements OnInit {
     if (this.memberData) {
       this.member = { ...this.memberData };
       this.isEditMode = true;
-      // Convert ISO dates to date input format (YYYY-MM-DD)
+      // Ensure dates are in ISO format for ion-datetime
       if (this.member.startDate) {
-        this.member.startDate = new Date(this.member.startDate).toISOString().split('T')[0];
+        this.member.startDate = new Date(this.member.startDate).toISOString();
       }
       if (this.member.endDate) {
-        this.member.endDate = new Date(this.member.endDate).toISOString().split('T')[0];
+        this.member.endDate = new Date(this.member.endDate).toISOString();
       }
     } else if (this.memberId) {
       this.isEditMode = true;
@@ -62,12 +64,12 @@ export class AddMemberPage implements OnInit {
       const member = await this.memberService.getMember(this.memberId);
       if (member) {
         this.member = { ...member };
-        // Convert ISO dates to date input format (YYYY-MM-DD)
+        // Ensure dates are in ISO format for ion-datetime
         if (this.member.startDate) {
-          this.member.startDate = new Date(this.member.startDate).toISOString().split('T')[0];
+          this.member.startDate = new Date(this.member.startDate).toISOString();
         }
         if (this.member.endDate) {
-          this.member.endDate = new Date(this.member.endDate).toISOString().split('T')[0];
+          this.member.endDate = new Date(this.member.endDate).toISOString();
         }
       }
     } catch (error) {
@@ -81,12 +83,8 @@ export class AddMemberPage implements OnInit {
   }
 
   setDefaultDates() {
-    const today = new Date();
-    const oneMonthFromNow = new Date();
-    oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-    
-    this.member.startDate = today.toISOString().split('T')[0];
-    this.member.endDate = oneMonthFromNow.toISOString().split('T')[0];
+    this.member.startDate = undefined;
+    this.member.endDate = undefined;
   }
 
   onPhotoSelected(event: any) {
@@ -116,25 +114,54 @@ export class AddMemberPage implements OnInit {
     this.dismiss();
   }
 
+  openStartDatePicker() {
+    this.startDatePickerValue = this.member.startDate || new Date().toISOString();
+    this.isStartDatePickerOpen = true;
+  }
+
+  closeStartDatePicker() {
+    this.isStartDatePickerOpen = false;
+  }
+
+  onStartDateSelected(event: any) {
+    if (event.detail?.value) {
+      this.member.startDate = event.detail.value;
+      this.calculateEndDate();
+      this.closeStartDatePicker();
+    }
+  }
+
   onMembershipTypeChange() {
-    if (!this.member.membershipType || !this.member.startDate) return;
-    
+    if (!this.member.membershipType || !this.member.startDate) {
+      return;
+    }
+    this.calculateEndDate();
+  }
+
+  private calculateEndDate() {
+    if (!this.member.startDate || !this.member.membershipType) {
+      this.member.endDate = undefined;
+      return;
+    }
+
     const startDate = new Date(this.member.startDate);
     const endDate = new Date(startDate);
-    
+
+    let daysToAdd = 30; // default for monthly
     switch (this.member.membershipType) {
       case 'monthly':
-        endDate.setMonth(endDate.getMonth() + 1);
+        daysToAdd = 30;
         break;
       case 'quarterly':
-        endDate.setMonth(endDate.getMonth() + 3);
+        daysToAdd = 90;
         break;
       case 'yearly':
-        endDate.setFullYear(endDate.getFullYear() + 1);
+        daysToAdd = 365;
         break;
     }
-    
-    this.member.endDate = endDate.toISOString().split('T')[0];
+
+    endDate.setDate(endDate.getDate() + daysToAdd);
+    this.member.endDate = endDate.toISOString();
   }
 
   async onSubmit() {
@@ -147,11 +174,11 @@ export class AddMemberPage implements OnInit {
     this.isLoading = true;
 
     try {
-      // Convert date strings to ISO format for storage
+      // Dates are already in ISO format from ion-datetime
       const memberData = {
         ...this.member,
-        startDate: new Date(this.member.startDate!).toISOString(),
-        endDate: new Date(this.member.endDate!).toISOString()
+        startDate: this.member.startDate,
+        endDate: this.member.endDate
       };
 
       if (this.isEditMode && this.memberId) {

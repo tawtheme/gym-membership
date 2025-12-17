@@ -77,4 +77,69 @@
         (click)="createReminder()">
         <span class="material-icons">add</span>
     </button>
+
+    <!-- Create Reminder Modal -->
+    <ion-modal
+        [isOpen]="isCreateReminderOpen"
+        (didDismiss)="closeCreateReminder()"
+        cssClass="create-reminder-modal">
+        <ng-template>
+            <ion-header>
+                <ion-toolbar>
+                    <ion-title>Create Reminder</ion-title>
+                    <ion-buttons slot="end">
+                        <ion-button (click)="closeCreateReminder()">
+                            <ion-icon slot="icon-only" name="close"></ion-icon>
+                        </ion-button>
+                    </ion-buttons>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <div class="reminder-form">
+                    <div class="form-group">
+                        <label class="form-label">Title <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            [(ngModel)]="reminderForm.title"
+                            placeholder="Enter reminder title"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message <span class="required">*</span></label>
+                        <textarea
+                            class="form-textarea"
+                            [(ngModel)]="reminderForm.message"
+                            placeholder="Enter reminder message"
+                            rows="4"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Scheduled Date & Time <span class="required">*</span></label>
+                        <ion-datetime
+                            [(ngModel)]="reminderForm.scheduledDate"
+                            presentation="date-time"
+                            [value]="reminderForm.scheduledDate"
+                            (ionChange)="onScheduledDateChange($event)"
+                        ></ion-datetime>
+                    </div>
+
+                    <div class="form-actions">
+                        <ion-button
+                            fill="outline"
+                            (click)="closeCreateReminder()">
+                            Cancel
+                        </ion-button>
+                        <ion-button
+                            (click)="saveReminder()"
+                            [disabled]="!reminderForm.title || !reminderForm.message">
+                            Create
+                        </ion-button>
+                    </div>
+                </div>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
 </ion-content>

@@ -86,25 +86,30 @@
 
                 <div class="form-group">
                     <label class="form-label">Active Plan Date <span class="required">*</span></label>
-                    <input
-                        type="date"
-                        class="form-input"
-                        [(ngModel)]="member.startDate"
-                        name="startDate"
-                        (change)="onMembershipTypeChange()"
-                        required
-                    />
+                    <button
+                        type="button"
+                        class="form-input date-input"
+                        (click)="openStartDatePicker()"
+                    >
+                        <span *ngIf="member.startDate; else startPlaceholder">
+                            {{ member.startDate | date:'MMM d, y' }}
+                        </span>
+                        <ng-template #startPlaceholder>
+                            <span class="placeholder-text">Select start date</span>
+                        </ng-template>
+                    </button>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">End Date <span class="required">*</span></label>
-                    <input
-                        type="date"
-                        class="form-input"
-                        [(ngModel)]="member.endDate"
-                        name="endDate"
-                        required
-                    />
+                    <label class="form-label">End Date</label>
+                    <div class="form-input date-display">
+                        <span *ngIf="member.endDate; else endPlaceholder">
+                            {{ member.endDate | date:'MMM d, y' }}
+                        </span>
+                        <ng-template #endPlaceholder>
+                            <span class="placeholder-text">Calculated from plan</span>
+                        </ng-template>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -168,3 +173,30 @@
         </form>
     </div>
 </ion-content>
+
+<!-- Start Date Picker Modal -->
+<ion-modal
+    [isOpen]="isStartDatePickerOpen"
+    (didDismiss)="closeStartDatePicker()"
+    cssClass="start-date-modal"
+>
+    <ng-template>
+        <ion-header>
+            <ion-toolbar>
+                <ion-title>Select Start Date</ion-title>
+                <ion-buttons slot="end">
+                    <ion-button (click)="closeStartDatePicker()">
+                        <ion-icon slot="icon-only" name="close"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <ion-datetime
+                [value]="startDatePickerValue"
+                presentation="date"
+                (ionChange)="onStartDateSelected($event)"
+            ></ion-datetime>
+        </ion-content>
+    </ng-template>
+</ion-modal>

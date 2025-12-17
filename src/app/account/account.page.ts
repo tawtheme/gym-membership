@@ -74,7 +74,7 @@ export class AccountPage implements OnInit {
   async clearAllData() {
     const alert = await this.alertController.create({
       header: 'Clear All Data',
-      message: 'Are you sure you want to delete all members and reminders? This action cannot be undone.',
+      message: 'This will permanently delete all members, reminders, and payment history.\n\nYour login details will NOT be removed.\n\nDo you want to continue?',
       buttons: [
         {
           text: 'Cancel',
@@ -85,9 +85,10 @@ export class AccountPage implements OnInit {
           role: 'destructive',
           handler: async () => {
             try {
-              // Clear all data - you would need to implement this in SQLite service
-              this.showToast('Clear data functionality needs to be implemented in SQLite', 'warning');
+              await this.storageService.clearAllData();
+              this.showToast('All data cleared successfully.', 'success');
             } catch (error) {
+              console.error('Error clearing data:', error);
               this.showToast('Error clearing data', 'danger');
             }
           }

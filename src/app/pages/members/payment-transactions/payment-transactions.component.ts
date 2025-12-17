@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { PaymentTransaction } from '../../../models/member.interface';
-import { DataService } from '../../../services/data.service';
+import { SqliteService } from '../../../services/sqlite.service';
 
 interface GroupedTransactions {
   month: string;
@@ -23,7 +23,7 @@ export class PaymentTransactionsComponent implements OnInit {
   filteredTransactions: PaymentTransaction[] = [];
   filterTab: 'all' | 'recent' | 'thisMonth' = 'all';
 
-  constructor(private dataService: DataService) {}
+  constructor(private sqliteService: SqliteService) {}
 
   async ngOnInit() {
     // If transactions are provided via input, use them; otherwise load from service
@@ -32,7 +32,7 @@ export class PaymentTransactionsComponent implements OnInit {
     } else {
       // Load all transactions if memberName is provided
       try {
-        this.transactions = await this.dataService.getPaymentTransactions();
+        this.transactions = await this.sqliteService.getPaymentTransactions();
       } catch (error) {
         console.error('Error loading transactions:', error);
         this.transactions = [];

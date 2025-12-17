@@ -55,4 +55,8 @@ export class StorageService {
     return await this.sqliteService.restoreBackup(backupData);
   }
 
+  async clearAllData(): Promise<void> {
+    await this.sqliteService.clearAllData();
+  }
+
 }

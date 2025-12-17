@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../services/member';
 import { Reminder } from '../models/member.interface';
 import { SnackbarService } from '../shared/snackbar/snackbar.service';
@@ -15,9 +15,18 @@ export class RemindersPage implements OnInit {
   filteredReminders: Reminder[] = [];
   filterType: 'all' | 'upcoming' | 'sent' = 'all';
 
+  isCreateReminderOpen: boolean = false;
+  reminderForm = {
+    title: '',
+    message: '',
+    type: 'custom',
+    scheduledDate: new Date().toISOString()
+  };
+
   constructor(
     private memberService: MemberService,
     private alertController: AlertController,
+    private modalController: ModalController,
     private snackbar: SnackbarService
   ) {}
 
@@ -69,65 +78,49 @@ export class RemindersPage implements OnInit {
     );
   }
 
-  async createReminder() {
-    const alert = await this.alertController.create({
-      header: 'Create Reminder',
-      inputs: [
-        {
-          name: 'title',
-          type: 'text',
-          placeholder: 'Reminder title'
-        },
-        {
-          name: 'message',
-          type: 'textarea',
-          placeholder: 'Reminder message'
-        },
-        {
-          name: 'type',
-          type: 'radio',
-          label: 'Reminder Type',
-          value: 'custom'
-        },
-        {
-          name: 'scheduledDate',
-          type: 'datetime-local',
-          value: new Date().toISOString().slice(0, 16)
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Create',
-          handler: async (data) => {
-            if (!data.title || !data.message) {
-              this.showToast('Please fill in all fields', 'danger');
-              return;
-            }
+  createReminder() {
+    this.reminderForm = {
+      title: '',
+      message: '',
+      type: 'custom',
+      scheduledDate: new Date().toISOString()
+    };
+    this.isCreateReminderOpen = true;
+  }
 
-            try {
-              await this.memberService.createReminder({
-                memberId: 'general', // For general reminders
-                type: data.type || 'custom',
-                title: data.title,
-                message: data.message,
-                scheduledDate: new Date(data.scheduledDate).toISOString(),
-                isSent: false
-              });
-              
-              this.showToast('Reminder created successfully!', 'success');
-              await this.loadReminders();
-            } catch (error) {
-              this.showToast('Error creating reminder', 'danger');
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
+  closeCreateReminder() {
+    this.isCreateReminderOpen = false;
+  }
+
+  onScheduledDateChange(event: any) {
+    if (event.detail?.value) {
+      this.reminderForm.scheduledDate = event.detail.value;
+    }
+  }
+
+  async saveReminder() {
+    if (!this.reminderForm.title || !this.reminderForm.message) {
+      this.showToast('Please fill in all fields', 'danger');
+      return;
+    }
+
+    try {
+      await this.memberService.createReminder({
+        memberId: 'general', // For general reminders
+        type: (this.reminderForm.type || 'custom') as Reminder['type'],
+        title: this.reminderForm.title,
+        message: this.reminderForm.message,
+        scheduledDate: this.reminderForm.scheduledDate, // Already in ISO format from ion-datetime
+        isSent: false
+      });
+      
+      this.showToast('Reminder created successfully!', 'success');
+      this.closeCreateReminder();
+      await this.loadReminders();
+    } catch (error) {
+      console.error('Error creating reminder:', error);
+      this.showToast('Error creating reminder', 'danger');
+    }
   }
 
   async markAsSent(reminder: Reminder) {

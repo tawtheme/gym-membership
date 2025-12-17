@@ -4,7 +4,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../../services/member';
 import { Member, Reminder } from '../../models/member.interface';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
-import { DataService } from '../../services/data.service';
+import { SqliteService } from '../../services/sqlite.service';
 import { SnackbarService } from '../../shared/snackbar/snackbar.service';
 import { AddMemberPage } from '../add-member/add-member.page';
 
@@ -27,7 +27,7 @@ export class MembersPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private modalCtrl: ModalController,
-    private dataService: DataService,
+    private sqliteService: SqliteService,
     private snackbar: SnackbarService
   ) { }
 
@@ -53,7 +53,7 @@ export class MembersPage implements OnInit {
 
   async loadNotifications() {
     try {
-      const allNotifications = await this.dataService.getReminders();
+      const allNotifications = await this.sqliteService.getAllReminders();
       // Filter to show only renewal notifications
       this.notifications = allNotifications.filter(n => n.type === 'renewal');
       // Sort by scheduled date, newest first

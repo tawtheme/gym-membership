@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DATABASE_CONFIG, TABLE_NAMES } from './database.config';
 import { CREATE_TABLES_SQL, INSERT_DEFAULT_DATA_SQL } from './sql-scripts';
@@ -195,6 +196,7 @@ export class DatabaseInitService {
     await this.database.execute(CREATE_TABLES_SQL.MEMBERS);
     await this.database.execute(CREATE_TABLES_SQL.REMINDERS);
     await this.database.execute(CREATE_TABLES_SQL.BACKUP_SETTINGS);
+    await this.database.execute(CREATE_TABLES_SQL.PAYMENT_TRANSACTIONS);
   }
 
   private async insertDefaultData(): Promise<void> {

@@ -2,7 +2,7 @@ import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { ModalController, ActionSheetController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Member, PaymentTransaction } from '../../../models/member.interface';
-import { DataService } from '../../../services/data.service';
+import { SqliteService } from '../../../services/sqlite.service';
 import { UpdatePaymentComponent } from '../update-payment/update-payment.component';
 import { AddMemberPage } from '../../add-member/add-member.page';
 
@@ -22,7 +22,7 @@ export class MemberDetailComponent implements OnInit {
     private router: Router,
     private actionSheetCtrl: ActionSheetController,
     private alertController: AlertController,
-    private dataService: DataService
+    private sqliteService: SqliteService
   ) {}
 
   ngOnInit() {
@@ -30,55 +30,16 @@ export class MemberDetailComponent implements OnInit {
   }
 
   async loadTransactions() {
-    // Load transactions from JSON data
+    // Load transactions from database / web store
     try {
-      const allTransactions = await this.dataService.getPaymentTransactions(this.member.id);
-      
-      // If we have transactions, use them; otherwise create mock data
-      if (allTransactions.length > 0) {
-        this.transactions = allTransactions.sort(
-          (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-        );
-      } else {
-        // Fallback to mock data if no transactions found
-        const baseAmount = this.getMembershipAmount();
-        const today = new Date();
-
-        this.transactions = Array.from({ length: 5 }).map((_, index) => {
-          const date = new Date(today);
-          date.setMonth(today.getMonth() - index);
-
-          const modes: PaymentTransaction['paymentMode'][] = ['cash', 'card', 'online', 'upi', 'cash'];
-          const mode = modes[index % modes.length];
-
-          return {
-            id: String(index + 1),
-            memberId: this.member.id,
-            amount: baseAmount,
-            paymentDate: date.toISOString(),
-            paymentMode: mode,
-            description: `${this.member.membershipType} membership payment #${index + 1}`,
-            createdAt: date.toISOString()
-          };
-        });
-
-        this.transactions.sort(
-          (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-        );
-      }
+      const allTransactions = await this.sqliteService.getPaymentTransactions(this.member.id);
+      // Use only real transactions; if none, keep list empty
+      this.transactions = allTransactions.sort(
+        (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+      );
     } catch (error) {
       console.error('Error loading transactions:', error);
       this.transactions = [];
-    }
-  }
-
-  getMembershipAmount(): number {
-    // Mock amounts - in real app, this would come from settings or member data
-    switch (this.member.membershipType) {
-      case 'monthly': return 1000;
-      case 'quarterly': return 2700;
-      case 'yearly': return 10000;
-      default: return 0;
     }
   }
 

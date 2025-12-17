@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Member, PaymentTransaction } from '../../../models/member.interface';
-import { DataService } from '../../../services/data.service';
+import { SqliteService } from '../../../services/sqlite.service';
 import { MemberService } from '../../../services/member';
 import { SnackbarService } from '../../../shared/snackbar/snackbar.service';
 
@@ -15,7 +15,7 @@ export class UpdatePaymentComponent implements OnInit {
   @Input() member!: Member;
 
   paymentAmount: number = 0;
-  paymentDate: string = new Date().toISOString().split('T')[0];
+  paymentDate: string = new Date().toISOString();
   paymentMode: 'cash' | 'card' | 'online' | 'upi' = 'cash';
   description: string = '';
 
@@ -27,7 +27,7 @@ export class UpdatePaymentComponent implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private dataService: DataService,
+    private sqliteService: SqliteService,
     private memberService: MemberService,
     private snackbar: SnackbarService
   ) { }
@@ -52,6 +52,12 @@ export class UpdatePaymentComponent implements OnInit {
     return icons[mode] || 'payment';
   }
 
+  onPaymentDateChange(event: any) {
+    if (event.detail?.value) {
+      this.paymentDate = event.detail.value;
+    }
+  }
+
   async savePayment() {
     if (!this.paymentAmount || this.paymentAmount <= 0) {
       this.showToast('Please enter a valid payment amount', 'danger');
@@ -68,17 +74,17 @@ export class UpdatePaymentComponent implements OnInit {
       const transaction: Omit<PaymentTransaction, 'id' | 'createdAt'> = {
         memberId: this.member.id,
         amount: this.paymentAmount,
-        paymentDate: new Date(this.paymentDate).toISOString(),
+        paymentDate: this.paymentDate, // Already in ISO format from ion-datetime
         paymentMode: this.paymentMode,
         description: this.description || `${this.member.membershipType} membership payment`
       };
 
-      await this.dataService.addPaymentTransaction(transaction);
+      await this.sqliteService.addPaymentTransaction(transaction);
 
       // Update member's last payment date and extend membership
       const paymentDateObj = new Date(this.paymentDate);
       const updatedMember: Partial<Member> = {
-        lastPaymentDate: paymentDateObj.toISOString(),
+        lastPaymentDate: this.paymentDate, // Already in ISO format
         isActive: true
       };
 

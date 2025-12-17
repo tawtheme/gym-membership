@@ -49,6 +49,19 @@ export const CREATE_TABLES_SQL = {
       last_backup TEXT,
       next_backup TEXT
     )
+  `,
+
+  PAYMENT_TRANSACTIONS: `
+    CREATE TABLE IF NOT EXISTS payment_transactions (
+      id TEXT PRIMARY KEY,
+      member_id TEXT NOT NULL,
+      amount REAL NOT NULL,
+      payment_date TEXT NOT NULL,
+      payment_mode TEXT NOT NULL,
+      description TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE
+    )
   `
 };
 

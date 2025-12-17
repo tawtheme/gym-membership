@@ -14,7 +14,6 @@ import { AuthService } from './services/auth';
 import { StorageService } from './services/storage';
 import { MemberService } from './services/member';
 import { SqliteService } from './services/sqlite.service';
-import { DataService } from './services/data.service';
 import { DatabaseInitService, DatabaseOperationsService } from './database';
 
 @NgModule({
@@ -34,7 +33,6 @@ import { DatabaseInitService, DatabaseOperationsService } from './database';
     StorageService,
     MemberService,
     SqliteService,
-    DataService,
     DatabaseInitService,
     DatabaseOperationsService
   ],

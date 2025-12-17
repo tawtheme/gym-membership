@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DatabaseInitService } from './database-init.service';
 import { TABLE_NAMES } from './database.config';
@@ -9,14 +10,21 @@ import { TABLE_NAMES } from './database.config';
 export class DatabaseOperationsService {
   private database: SQLiteDBConnection | null = null;
   private initPromise: Promise<void> | null = null;
+  private readonly isNative: boolean;
 
   constructor(private dbInitService: DatabaseInitService) {
-    console.log('DatabaseOperationsService constructor called');
-    // Kick off initialization, but don't block constructor
-    this.initPromise = this.initializeDatabase().catch(error => {
-      console.error('Failed to initialize database in constructor:', error);
-      this.initPromise = null;
-    });
+    this.isNative = Capacitor.getPlatform() !== 'web';
+
+    if (this.isNative) {
+      console.log('DatabaseOperationsService constructor called - initializing SQLite');
+      // Kick off initialization, but don't block constructor
+      this.initPromise = this.initializeDatabase().catch(error => {
+        console.error('Failed to initialize database in constructor:', error);
+        this.initPromise = null;
+      });
+    } else {
+      console.log('DatabaseOperationsService: running on web - skipping SQLite initialization (DataService will be used instead)');
+    }
   }
 
   private async initializeDatabase() {
@@ -31,6 +39,10 @@ export class DatabaseOperationsService {
   }
 
   private async ensureDatabaseInitialized(): Promise<void> {
+    if (!this.isNative) {
+      throw new Error('SQLite is not available on web platform.');
+    }
+
     if (this.database) {
       return;
     }
@@ -182,6 +194,50 @@ export class DatabaseOperationsService {
     return result.values ? result.values.map((row: any) => this.mapRowToReminder(row)) : [];
   }
 
+  // Payment transaction operations
+  async addPaymentTransaction(transaction: any): Promise<string> {
+    await this.ensureDatabaseInitialized();
+    if (!this.database) throw new Error('Database not initialized');
+
+    const id = this.generateId();
+    const now = new Date().toISOString();
+
+    await this.database.run(`
+      INSERT INTO ${TABLE_NAMES.PAYMENT_TRANSACTIONS}
+        (id, member_id, amount, payment_date, payment_mode, description, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [
+      id,
+      transaction.memberId,
+      transaction.amount,
+      transaction.paymentDate,
+      transaction.paymentMode,
+      transaction.description || null,
+      now
+    ]);
+
+    return id;
+  }
+
+  async getPaymentTransactions(memberId?: string): Promise<any[]> {
+    await this.ensureDatabaseInitialized();
+    if (!this.database) throw new Error('Database not initialized');
+
+    let result;
+    if (memberId) {
+      result = await this.database.query(
+        `SELECT * FROM ${TABLE_NAMES.PAYMENT_TRANSACTIONS} WHERE member_id = ? ORDER BY payment_date DESC`,
+        [memberId]
+      );
+    } else {
+      result = await this.database.query(
+        `SELECT * FROM ${TABLE_NAMES.PAYMENT_TRANSACTIONS} ORDER BY payment_date DESC`
+      );
+    }
+
+    return result.values ? result.values.map((row: any) => this.mapRowToPayment(row)) : [];
+  }
+
   // Backup operations
   async getBackupSettings(): Promise<any> {
     await this.ensureDatabaseInitialized();
@@ -209,6 +265,28 @@ export class DatabaseOperationsService {
       UPDATE ${TABLE_NAMES.BACKUP_SETTINGS} 
       SET frequency = ?, is_enabled = ?, last_backup = ?, next_backup = ?
     `, [settings.frequency, settings.isEnabled ? 1 : 0, settings.lastBackup || null, settings.nextBackup || null]);
+  }
+
+  // Clear all data (members, reminders, payments)
+  async clearAllData(): Promise<void> {
+    await this.ensureDatabaseInitialized();
+    if (!this.database) throw new Error('Database not initialized');
+
+    // Use a transaction to ensure consistency
+    try {
+      await this.database.execute('BEGIN TRANSACTION');
+
+      // Delete dependent tables first
+      await this.database.run(`DELETE FROM ${TABLE_NAMES.PAYMENT_TRANSACTIONS}`);
+      await this.database.run(`DELETE FROM ${TABLE_NAMES.REMINDERS}`);
+      await this.database.run(`DELETE FROM ${TABLE_NAMES.MEMBERS}`);
+
+      await this.database.execute('COMMIT');
+    } catch (error) {
+      console.error('Error clearing all data:', error);
+      await this.database?.execute('ROLLBACK');
+      throw error;
+    }
   }
 
   // Helper methods
@@ -239,6 +317,18 @@ export class DatabaseOperationsService {
       message: row['message'],
       scheduledDate: row['scheduled_date'],
       isSent: row['is_sent'] === 1,
+      createdAt: row['created_at']
+    };
+  }
+
+  private mapRowToPayment(row: any): any {
+    return {
+      id: row['id'],
+      memberId: row['member_id'],
+      amount: row['amount'],
+      paymentDate: row['payment_date'],
+      paymentMode: row['payment_mode'],
+      description: row['description'],
       createdAt: row['created_at']
     };
   }

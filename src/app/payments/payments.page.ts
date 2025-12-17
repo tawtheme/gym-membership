@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
-import { DataService } from '../services/data.service';
+import { SqliteService } from '../services/sqlite.service';
 import { PaymentTransaction, Member } from '../models/member.interface';
 import { UpdatePaymentComponent } from '../pages/members/update-payment/update-payment.component';
 import { SnackbarService } from '../shared/snackbar/snackbar.service';
@@ -20,7 +20,7 @@ export class PaymentsPage implements OnInit {
   memberSearchQuery: string = '';
 
   constructor(
-    private dataService: DataService,
+    private sqliteService: SqliteService,
     private modalController: ModalController,
     private alertController: AlertController,
     private snackbar: SnackbarService
@@ -32,7 +32,7 @@ export class PaymentsPage implements OnInit {
 
   async loadAllTransactions() {
     try {
-      this.allTransactions = await this.dataService.getPaymentTransactions();
+      this.allTransactions = await this.sqliteService.getPaymentTransactions();
       // Sort by date, newest first
       this.allTransactions.sort((a, b) => 
         new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
@@ -46,7 +46,7 @@ export class PaymentsPage implements OnInit {
   async openAddPayment() {
     try {
       // Load all members for selection
-      const members = await this.dataService.getMembers();
+      const members = await this.sqliteService.getAllMembers();
       
       if (members.length === 0) {
         this.showToast('No members found. Please add a member first.', 'warning');
