@@ -1,0 +1,159 @@
+<ion-content [fullscreen]="true" class="account-content">
+    <ion-header collapse="condense">
+        <ion-toolbar class="account-toolbar">
+            <ion-title size="large">Account</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <div class="account-page">
+        <!-- User Info Section -->
+        <section class="account-section">
+            <div class="section-title">Account Information</div>
+            <div class="account-card">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <span class="material-icons">person</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-value">Name</div>
+                        <div class="info-label">{{ userName || 'Not set' }}</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <span class="material-icons">email</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-value">Email Address</div>
+                        <div class="info-label">{{ userEmail || 'Not set' }}</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <span class="material-icons">phone</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-value">Mobile Number</div>
+                        <div class="info-label">{{ currentUser || 'Not logged in' }}</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <span class="material-icons">home</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-value">Address</div>
+                        <div class="info-label">{{ userAddress || 'Not set' }}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- App Settings Section -->
+        <section class="account-section">
+            <div class="section-title">App Settings</div>
+            <div class="account-card">
+                <div class="setting-item">
+                    <div class="setting-content">
+                        <div class="setting-label">Enable Notifications</div>
+                        <div class="setting-description">Receive notifications for reminders</div>
+                    </div>
+                    <div class="toggle-group">
+                        <input 
+                            type="checkbox" 
+                            id="notifications" 
+                            class="toggle-checkbox" 
+                            [(ngModel)]="settings.notifications"
+                            (change)="onNotificationToggle()"
+                        />
+                        <label for="notifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-content">
+                        <div class="setting-label">Auto Backup</div>
+                        <div class="setting-description">Automatically backup your data</div>
+                    </div>
+                    <div class="toggle-group">
+                        <input 
+                            type="checkbox" 
+                            id="autoBackup" 
+                            class="toggle-checkbox" 
+                            [(ngModel)]="settings.autoBackup"
+                            (change)="onAutoBackupToggle()"
+                        />
+                        <label for="autoBackup" class="toggle-slider"></label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Management Section -->
+        <section class="account-section">
+            <div class="section-title">Data Management</div>
+            <div class="account-card">
+                <button class="action-item" (click)="clearAllData()">
+                    <div class="action-icon primary">
+                        <span class="material-icons">delete</span>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-label">Clear All Data</div>
+                        <div class="action-description">Delete all members and reminders</div>
+                    </div>
+                    <div class="action-arrow">
+                        <span class="material-icons">chevron_right</span>
+                    </div>
+                </button>
+
+                <div class="divider"></div>
+
+                <button class="action-item" (click)="exportAllData()">
+                    <div class="action-icon primary">
+                        <span class="material-icons">download</span>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-label">Export All Data</div>
+                        <div class="action-description">Download all data as JSON file</div>
+                    </div>
+                    <div class="action-arrow">
+                        <span class="material-icons">chevron_right</span>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="account-section">
+            <div class="section-title">About</div>
+            <div class="account-card">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <span class="material-icons">info</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">App Version</div>
+                        <div class="info-value">1.0.0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logout Section -->
+        <section class="account-section">
+            <button class="logout-button" (click)="logout()">
+                <span class="material-icons">logout</span>
+                <span>Logout</span>
+            </button>
+        </section>
+    </div>
+</ion-content>

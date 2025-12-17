@@ -13,15 +13,15 @@ const routes: Routes = [
       },
       {
         path: 'reminders',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        loadChildren: () => import('../reminders/reminders.module').then(m => m.RemindersPageModule)
       },
       {
         path: 'backup',
-        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+        loadChildren: () => import('../payments/payments.module').then(m => m.PaymentsPageModule)
       },
       {
         path: 'settings',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        loadChildren: () => import('../account/account.module').then(m => m.AccountPageModule)
       },
       {
         path: '',

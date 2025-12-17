@@ -6,6 +6,11 @@
             </ion-button>
         </ion-buttons>
         <ion-title>Member Details</ion-title>
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="showActions()">
+                <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+            </ion-button>
+        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
@@ -23,6 +28,13 @@
 
         <!-- Payment summary as its own card -->
         <div class="detail-card detail-card--payment">
+            <div class="detail-payments-header">
+                <h4>Payment Information</h4>
+                <button type="button" class="update-payment-btn" (click)="updatePayment()">
+                    <span class="material-icons">add</span>
+                    Update Payment
+                </button>
+            </div>
             <div class="detail-payments">
                 <div class="detail-progress" *ngIf="hasDates">
                     <div class="progress-header">
@@ -65,40 +77,19 @@
         </div>
 
         <!-- Payment Transactions Listing -->
-        <div class="detail-card detail-card--transactions" *ngIf="transactions.length > 0">
-            <div class="transactions-header">
-                <div class="transactions-title">Payment Transactions</div>
-                <div class="transactions-count">{{ transactions.length }}</div>
-            </div>
-            <div class="transactions-list">
-                <div class="transaction-item" *ngFor="let transaction of transactions">
-                    <div class="transaction-icon">
-                        <span class="material-icons">{{ getPaymentModeIcon(transaction.paymentMode) }}</span>
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-description">
-                            {{ transaction.description || 'Membership Payment' }}
-                        </div>
-                        <div class="transaction-meta">
-                            <span class="transaction-date">{{ transaction.paymentDate | date: 'MMM d, y' }}</span>
-                            <span class="transaction-mode">{{ transaction.paymentMode | titlecase }}</span>
-                        </div>
-                    </div>
-                    <div class="transaction-amount">
-                        ₹{{ transaction.amount }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <app-payment-transactions
+            *ngIf="transactions.length > 0"
+            [transactions]="transactions"
+            [memberName]="member.name"
+        ></app-payment-transactions>
 
-        <div class="detail-actions">
-            <button type="button" class="action-button edit" (click)="edit()">
-                Edit
-            </button>
-            <button type="button" class="action-button delete" (click)="dismiss()">
-                Close
-            </button>
-        </div>
+        <!-- Empty State for Transactions -->
+        <app-no-data-found
+            *ngIf="transactions.length === 0"
+            icon="receipt_long"
+            title="No Payment Transactions"
+            message="No payment transactions found for this member">
+        </app-no-data-found>
         
     </div>
 </ion-content>

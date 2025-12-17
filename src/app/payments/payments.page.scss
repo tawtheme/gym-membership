@@ -127,3 +127,37 @@
 ion-content {
     --background: transparent;
 }
+
+.payments-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px; // Position above tab bar
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    border: none;
+    background: var(--color-primary-500);
+    color: var(--color-neutral-25);
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 1000;
+
+    &:hover {
+        background: var(--color-primary-600);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(255, 122, 0, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    .material-icons {
+        font-size: 28px;
+    }
+}

@@ -1,7 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { ModalController, ActionSheetController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Member, PaymentTransaction } from '../../../models/member.interface';
+import { DataService } from '../../../services/data.service';
+import { UpdatePaymentComponent } from '../update-payment/update-payment.component';
+import { AddMemberPage } from '../../add-member/add-member.page';
 
 @Component({
   selector: 'app-member-detail',
@@ -11,46 +14,62 @@ import { Member, PaymentTransaction } from '../../../models/member.interface';
 })
 export class MemberDetailComponent implements OnInit {
   @Input() member!: Member;
+  @Input() onDelete?: (member: Member) => Promise<void>;
   transactions: PaymentTransaction[] = [];
 
   constructor(
     private modalCtrl: ModalController,
-    private router: Router
+    private router: Router,
+    private actionSheetCtrl: ActionSheetController,
+    private alertController: AlertController,
+    private dataService: DataService
   ) {}
 
   ngOnInit() {
     this.loadTransactions();
   }
 
-  loadTransactions() {
-    // Mock 5 transactions so the design can be previewed.
-    // In a real app, replace this with data from a service / DB.
-    const baseAmount = this.getMembershipAmount();
-    const today = new Date();
+  async loadTransactions() {
+    // Load transactions from JSON data
+    try {
+      const allTransactions = await this.dataService.getPaymentTransactions(this.member.id);
+      
+      // If we have transactions, use them; otherwise create mock data
+      if (allTransactions.length > 0) {
+        this.transactions = allTransactions.sort(
+          (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+        );
+      } else {
+        // Fallback to mock data if no transactions found
+        const baseAmount = this.getMembershipAmount();
+        const today = new Date();
 
-    this.transactions = Array.from({ length: 5 }).map((_, index) => {
-      const date = new Date(today);
-      // Go back one month per record
-      date.setMonth(today.getMonth() - index);
+        this.transactions = Array.from({ length: 5 }).map((_, index) => {
+          const date = new Date(today);
+          date.setMonth(today.getMonth() - index);
 
-      const modes: PaymentTransaction['paymentMode'][] = ['cash', 'card', 'online', 'upi', 'cash'];
-      const mode = modes[index % modes.length];
+          const modes: PaymentTransaction['paymentMode'][] = ['cash', 'card', 'online', 'upi', 'cash'];
+          const mode = modes[index % modes.length];
 
-      return {
-        id: String(index + 1),
-        memberId: this.member.id,
-        amount: baseAmount,
-        paymentDate: date.toISOString(),
-        paymentMode: mode,
-        description: `${this.member.membershipType} membership payment #${index + 1}`,
-        createdAt: date.toISOString()
-      };
-    });
+          return {
+            id: String(index + 1),
+            memberId: this.member.id,
+            amount: baseAmount,
+            paymentDate: date.toISOString(),
+            paymentMode: mode,
+            description: `${this.member.membershipType} membership payment #${index + 1}`,
+            createdAt: date.toISOString()
+          };
+        });
 
-    // Newest first
-    this.transactions.sort(
-      (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-    );
+        this.transactions.sort(
+          (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+        );
+      }
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+      this.transactions = [];
+    }
   }
 
   getMembershipAmount(): number {
@@ -77,14 +96,118 @@ export class MemberDetailComponent implements OnInit {
     this.modalCtrl.dismiss();
   }
 
-  edit() {
+  async showActions() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Member Actions',
+      buttons: [
+        {
+          text: 'Update Payment',
+          icon: 'card-outline',
+          handler: () => {
+            this.updatePayment();
+          }
+        },
+        {
+          text: 'Edit',
+          icon: 'create-outline',
+          handler: () => {
+            this.edit();
+          }
+        },
+        {
+          text: 'Delete',
+          icon: 'trash-outline',
+          role: 'destructive',
+          handler: () => {
+            this.delete();
+          }
+        },
+        {
+          text: 'Cancel',
+          icon: 'close-outline',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  async updatePayment() {
+    const modal = await this.modalCtrl.create({
+      component: UpdatePaymentComponent,
+      componentProps: {
+        member: this.member
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.success) {
+      // Reload transactions and update member data
+      await this.loadTransactions();
+      // Update member if returned
+      if (data.member) {
+        Object.assign(this.member, data.member);
+      }
+    }
+  }
+
+  async edit() {
     if (!this.member) {
       return;
     }
-    this.modalCtrl.dismiss();
-    this.router.navigate(['/add-member'], {
-      queryParams: { id: this.member.id, edit: true }
+    
+    const modal = await this.modalCtrl.create({
+      component: AddMemberPage,
+      componentProps: {
+        memberId: this.member.id,
+        memberData: this.member
+      },
+      cssClass: 'add-member-modal'
     });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.success) {
+      // Reload member data if updated
+      if (data.member) {
+        Object.assign(this.member, data.member);
+      }
+      // Dismiss this modal and reload
+      this.modalCtrl.dismiss({ updated: true });
+    }
+  }
+
+  async delete() {
+    if (!this.member) {
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Delete Member',
+      message: `Are you sure you want to delete ${this.member.name}? This action cannot be undone.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: async () => {
+            if (this.onDelete) {
+              await this.onDelete(this.member);
+            }
+            this.modalCtrl.dismiss({ deleted: true });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   // --- Derived payment / timeline helpers for UI ---

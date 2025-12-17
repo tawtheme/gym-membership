@@ -8,7 +8,6 @@
         flex-direction: row;
         align-items: center;
         gap: 12px;
-        padding: 16px 0;
         border-radius: 18px;
         background: var(--color-neutral-25);
         position: relative;
@@ -73,6 +72,43 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 12px;
+
+        h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-dark-700);
+            margin: 0;
+        }
+
+        .update-payment-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--color-primary-500);
+            color: var(--color-neutral-25);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            .material-icons {
+                font-size: 18px;
+            }
+
+            &:hover {
+                background: var(--color-primary-600);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
     }
 
     .detail-card--payment .detail-payments-title {

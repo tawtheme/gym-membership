@@ -1,0 +1,18 @@
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar class="backup-toolbar">
+            <ion-title size="large">Payment Transactions</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <!-- Payment Transactions -->
+    <app-payment-transactions [transactions]="allTransactions"></app-payment-transactions>
+
+    <!-- Floating Action Button -->
+    <button
+        type="button"
+        class="payments-fab"
+        (click)="openAddPayment()">
+        <span class="material-icons">add</span>
+    </button>
+</ion-content>

@@ -37,8 +37,17 @@ export class AuthService {
         return true;
       }
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      const errorMessage = error?.message || error?.toString() || '';
+      
+      // Re-throw database initialization errors so login page can handle them
+      if (errorMessage.includes('Database not initialized') || 
+          errorMessage.includes('timeout') ||
+          errorMessage.includes('WASM')) {
+        throw new Error('Database initialization failed. Please refresh the page.');
+      }
+      
       return false;
     }
   }

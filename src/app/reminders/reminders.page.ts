@@ -4,15 +4,15 @@ import { MemberService } from '../services/member';
 import { Reminder } from '../models/member.interface';
 
 @Component({
-  selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss'],
+  selector: 'app-reminders',
+  templateUrl: 'reminders.page.html',
+  styleUrls: ['reminders.page.scss'],
   standalone: false,
 })
-export class Tab2Page implements OnInit {
+export class RemindersPage implements OnInit {
   reminders: Reminder[] = [];
   filteredReminders: Reminder[] = [];
-  filterType: string = 'all';
+  filterType: 'all' | 'upcoming' | 'sent' = 'all';
 
   constructor(
     private memberService: MemberService,
@@ -36,6 +36,11 @@ export class Tab2Page implements OnInit {
       console.error('Error loading reminders:', error);
       this.showToast('Error loading reminders', 'danger');
     }
+  }
+
+  setFilterTab(tab: 'all' | 'upcoming' | 'sent') {
+    this.filterType = tab;
+    this.applyFilters();
   }
 
   onFilterChange() {
@@ -173,6 +178,17 @@ export class Tab2Page implements OnInit {
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  }
+
+  formatScheduledDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   }
 
   private async showToast(message: string, color: string) {

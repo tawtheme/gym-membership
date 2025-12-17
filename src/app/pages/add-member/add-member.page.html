@@ -1,137 +1,170 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/members"></ion-back-button>
-    </ion-buttons>
-  </ion-toolbar>
+<ion-header translucent="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button fill="clear" (click)="dismiss()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</ion-title>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="add-member-content">
+    <div class="add-member-page">
 
-  <form #memberForm="ngForm" (ngSubmit)="onSubmit()">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Member Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item>
-          <ion-label position="stacked">Full Name *</ion-label>
-          <ion-input 
-            type="text" 
-            [(ngModel)]="member.name" 
-            name="name"
-            placeholder="Enter member's full name"
-            required>
-          </ion-input>
-        </ion-item>
+        <form #memberForm="ngForm" (ngSubmit)="onSubmit()" class="member-form">
+        <!-- Member Information Section -->
+        <div class="form-section">
+            <div class="section-title">Member Information</div>
+            <div class="form-card">
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="required">*</span></label>
+                    <input
+                        type="text"
+                        class="form-input"
+                        [(ngModel)]="member.name"
+                        name="name"
+                        placeholder="Enter member's full name"
+                        required
+                    />
+                </div>
 
-        <ion-item>
-          <ion-label position="stacked">Phone Number *</ion-label>
-          <ion-input 
-            type="tel" 
-            [(ngModel)]="member.phone" 
-            name="phone"
-            placeholder="Enter phone number"
-            required>
-          </ion-input>
-        </ion-item>
+                <div class="form-group">
+                    <label class="form-label">Phone Number <span class="required">*</span></label>
+                    <input
+                        type="tel"
+                        class="form-input"
+                        [(ngModel)]="member.phone"
+                        name="phone"
+                        placeholder="Enter phone number"
+                        required
+                    />
+                </div>
 
-        <ion-item>
-          <ion-label position="stacked">Email (Optional)</ion-label>
-          <ion-input 
-            type="email" 
-            [(ngModel)]="member.email" 
-            name="email"
-            placeholder="Enter email address">
-          </ion-input>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+                <div class="form-group">
+                    <label class="form-label">Email (Optional)</label>
+                    <input
+                        type="email"
+                        class="form-input"
+                        [(ngModel)]="member.email"
+                        name="email"
+                        placeholder="Enter email address"
+                    />
+                </div>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Membership Details</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item>
-          <ion-label position="stacked">Membership Type *</ion-label>
-          <ion-select 
-            [(ngModel)]="member.membershipType" 
-            name="membershipType"
-            placeholder="Select membership type"
-            required>
-            <ion-select-option value="monthly">Monthly</ion-select-option>
-            <ion-select-option value="quarterly">Quarterly</ion-select-option>
-            <ion-select-option value="yearly">Yearly</ion-select-option>
-          </ion-select>
-        </ion-item>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea
+                        class="form-textarea"
+                        [(ngModel)]="member.address"
+                        name="address"
+                        placeholder="Enter address"
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
 
-        <ion-item>
-          <ion-label position="stacked">Start Date *</ion-label>
-          <ion-datetime 
-            [(ngModel)]="member.startDate" 
-            name="startDate"
-            display-format="MMM DD, YYYY"
-            picker-format="MMM DD YYYY"
-            required>
-          </ion-datetime>
-        </ion-item>
+        <!-- Membership Details Section -->
+        <div class="form-section">
+            <div class="section-title">Membership Details</div>
+            <div class="form-card">
+                <div class="form-group">
+                    <label class="form-label">Play Type <span class="required">*</span></label>
+                    <select
+                        class="form-select"
+                        [(ngModel)]="member.membershipType"
+                        name="membershipType"
+                        (change)="onMembershipTypeChange()"
+                        required
+                    >
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
 
-        <ion-item>
-          <ion-label position="stacked">End Date *</ion-label>
-          <ion-datetime 
-            [(ngModel)]="member.endDate" 
-            name="endDate"
-            display-format="MMM DD, YYYY"
-            picker-format="MMM DD YYYY"
-            required>
-          </ion-datetime>
-        </ion-item>
+                <div class="form-group">
+                    <label class="form-label">Active Plan Date <span class="required">*</span></label>
+                    <input
+                        type="date"
+                        class="form-input"
+                        [(ngModel)]="member.startDate"
+                        name="startDate"
+                        (change)="onMembershipTypeChange()"
+                        required
+                    />
+                </div>
 
-        <ion-item>
-          <ion-label position="stacked">Status</ion-label>
-          <ion-toggle 
-            [(ngModel)]="member.isActive" 
-            name="isActive"
-            color="success">
-          </ion-toggle>
-          <ion-label>Active Member</ion-label>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+                <div class="form-group">
+                    <label class="form-label">End Date <span class="required">*</span></label>
+                    <input
+                        type="date"
+                        class="form-input"
+                        [(ngModel)]="member.endDate"
+                        name="endDate"
+                        required
+                    />
+                </div>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Additional Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item>
-          <ion-label position="stacked">Notes (Optional)</ion-label>
-          <ion-textarea 
-            [(ngModel)]="member.notes" 
-            name="notes"
-            placeholder="Add any additional notes about this member"
-            rows="3">
-          </ion-textarea>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="toggle-group">
+                        <label class="toggle-label">
+                            <input
+                                type="checkbox"
+                                class="toggle-checkbox"
+                                [(ngModel)]="member.isActive"
+                                name="isActive"
+                            />
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Active Member</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="form-actions">
-      <ion-button 
-        expand="block" 
-        type="submit" 
-        [disabled]="!memberForm.valid || isLoading"
-        class="ion-margin">
-        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
-        <span *ngIf="!isLoading">{{ isEditMode ? 'Update Member' : 'Add Member' }}</span>
-      </ion-button>
+        <!-- Photo Section -->
+        <div class="form-section">
+            <div class="section-title">Photo</div>
+            <div class="form-card">
+                <div class="photo-upload-group">
+                    <div class="photo-preview" *ngIf="member.avatarUrl || photoPreview">
+                        <img [src]="photoPreview || member.avatarUrl" alt="Member Photo" />
+                        <button type="button" class="photo-remove" (click)="removePhoto()">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                    <div class="photo-placeholder" *ngIf="!member.avatarUrl && !photoPreview">
+                        <span class="material-icons">person</span>
+                    </div>
+                    <input
+                        type="file"
+                        id="photo-upload"
+                        class="photo-input"
+                        accept="image/*"
+                        (change)="onPhotoSelected($event)"
+                    />
+                    <label for="photo-upload" class="photo-upload-button">
+                        <span class="material-icons">camera_alt</span>
+                        <span>{{ member.avatarUrl || photoPreview ? 'Change Photo' : 'Upload Photo' }}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button
+                type="submit"
+                class="submit-button"
+                [disabled]="!memberForm.valid || isLoading"
+            >
+                <span class="material-icons" *ngIf="isLoading">hourglass_empty</span>
+                <span *ngIf="!isLoading">{{ isEditMode ? 'Update Member' : 'Add Member' }}</span>
+            </button>
+        </div>
+        </form>
     </div>
-  </form>
 </ion-content>

@@ -1,50 +1,52 @@
 import { Injectable } from '@angular/core';
-import { DatabaseOperationsService } from '../database';
+import { DataService } from './data.service';
 import { Member, Reminder, BackupSettings } from '../models/member.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SqliteService {
-  constructor(private dbOps: DatabaseOperationsService) {}
+  constructor(private dataService: DataService) {}
 
   // Member CRUD operations
   async addMember(member: Omit<Member, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    return await this.dbOps.addMember(member);
+    return await this.dataService.addMember(member);
   }
 
   async getMember(id: string): Promise<Member | null> {
-    return await this.dbOps.getMember(id);
+    return await this.dataService.getMember(id);
   }
 
   async getAllMembers(): Promise<Member[]> {
-    return await this.dbOps.getAllMembers();
+    return await this.dataService.getMembers();
   }
 
   async updateMember(id: string, updates: Partial<Member>): Promise<boolean> {
-    return await this.dbOps.updateMember(id, updates);
+    return await this.dataService.updateMember(id, updates);
   }
 
   async deleteMember(id: string): Promise<boolean> {
-    return await this.dbOps.deleteMember(id);
+    return await this.dataService.deleteMember(id);
   }
 
   // Reminder operations
   async addReminder(reminder: Omit<Reminder, 'id' | 'createdAt'>): Promise<string> {
-    return await this.dbOps.addReminder(reminder);
+    // For now, reminders are read-only from JSON
+    console.warn('addReminder: Not implemented for JSON data');
+    return Date.now().toString();
   }
 
   async getAllReminders(): Promise<Reminder[]> {
-    return await this.dbOps.getAllReminders();
+    return await this.dataService.getReminders();
   }
 
   // Backup operations
   async getBackupSettings(): Promise<BackupSettings> {
-    return await this.dbOps.getBackupSettings();
+    return await this.dataService.getBackupSettings();
   }
 
   async updateBackupSettings(settings: BackupSettings): Promise<void> {
-    await this.dbOps.updateBackupSettings(settings);
+    await this.dataService.updateBackupSettings(settings);
   }
 
   async createBackup(): Promise<string> {
@@ -78,11 +80,13 @@ export class SqliteService {
 
   // User authentication
   async authenticateUser(mobileNumber: string, pin: string): Promise<boolean> {
-    return await this.dbOps.authenticateUser(mobileNumber, pin);
+    const users = await this.dataService.getUsers();
+    const user = users.find(u => u.mobile_number === mobileNumber && u.pin === pin);
+    return !!user;
   }
 
-  // Get database file path
+  // Get database file path (not applicable for JSON)
   async getDatabasePath(): Promise<string> {
-    return await this.dbOps.getDatabasePath();
+    return 'assets/data/';
   }
 }

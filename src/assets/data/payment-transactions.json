@@ -1,0 +1,164 @@
+[
+  {
+    "id": "txn1",
+    "memberId": "member1",
+    "amount": 1000,
+    "paymentDate": "2024-12-01T00:00:00.000Z",
+    "paymentMode": "cash",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn2",
+    "memberId": "member1",
+    "amount": 1000,
+    "paymentDate": "2024-11-01T00:00:00.000Z",
+    "paymentMode": "upi",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-11-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn3",
+    "memberId": "member1",
+    "amount": 1000,
+    "paymentDate": "2024-10-01T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn4",
+    "memberId": "member2",
+    "amount": 2700,
+    "paymentDate": "2024-11-01T00:00:00.000Z",
+    "paymentMode": "online",
+    "description": "Quarterly membership payment",
+    "createdAt": "2024-11-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn5",
+    "memberId": "member3",
+    "amount": 10000,
+    "paymentDate": "2024-01-01T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Yearly membership payment",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn6",
+    "memberId": "member4",
+    "amount": 1000,
+    "paymentDate": "2024-11-15T00:00:00.000Z",
+    "paymentMode": "cash",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-11-15T00:00:00.000Z"
+  },
+  {
+    "id": "txn7",
+    "memberId": "member5",
+    "amount": 1000,
+    "paymentDate": "2024-12-10T00:00:00.000Z",
+    "paymentMode": "upi",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-10T00:00:00.000Z"
+  },
+  {
+    "id": "txn8",
+    "memberId": "member6",
+    "amount": 1000,
+    "paymentDate": "2024-12-10T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-10T00:00:00.000Z"
+  },
+  {
+    "id": "txn9",
+    "memberId": "member6",
+    "amount": 1000,
+    "paymentDate": "2024-11-10T00:00:00.000Z",
+    "paymentMode": "online",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-11-10T00:00:00.000Z"
+  },
+  {
+    "id": "txn10",
+    "memberId": "member7",
+    "amount": 1000,
+    "paymentDate": "2024-12-05T00:00:00.000Z",
+    "paymentMode": "cash",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-05T00:00:00.000Z"
+  },
+  {
+    "id": "txn11",
+    "memberId": "member8",
+    "amount": 2700,
+    "paymentDate": "2024-12-01T00:00:00.000Z",
+    "paymentMode": "upi",
+    "description": "Quarterly membership payment",
+    "createdAt": "2024-12-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn12",
+    "memberId": "member9",
+    "amount": 1000,
+    "paymentDate": "2024-11-01T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-11-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn13",
+    "memberId": "member10",
+    "amount": 1000,
+    "paymentDate": "2024-10-15T00:00:00.000Z",
+    "paymentMode": "cash",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-10-15T00:00:00.000Z"
+  },
+  {
+    "id": "txn14",
+    "memberId": "member11",
+    "amount": 10000,
+    "paymentDate": "2023-12-01T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Yearly membership payment",
+    "createdAt": "2023-12-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn15",
+    "memberId": "member12",
+    "amount": 1000,
+    "paymentDate": "2024-12-01T00:00:00.000Z",
+    "paymentMode": "upi",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn16",
+    "memberId": "member13",
+    "amount": 2700,
+    "paymentDate": "2024-11-01T00:00:00.000Z",
+    "paymentMode": "online",
+    "description": "Quarterly membership payment",
+    "createdAt": "2024-11-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn17",
+    "memberId": "member14",
+    "amount": 10000,
+    "paymentDate": "2024-06-01T00:00:00.000Z",
+    "paymentMode": "card",
+    "description": "Yearly membership payment",
+    "createdAt": "2024-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "txn18",
+    "memberId": "member15",
+    "amount": 1000,
+    "paymentDate": "2024-12-12T00:00:00.000Z",
+    "paymentMode": "cash",
+    "description": "Monthly membership payment",
+    "createdAt": "2024-12-12T00:00:00.000Z"
+  }
+]

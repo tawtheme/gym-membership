@@ -1,172 +1,110 @@
-<div class="members-page">
-    <!-- Section Member List View -->
-    <div *ngIf="selectedSection">
-        <div class="section-header">
-            <button type="button" class="back-button" (click)="closeSection()">
-                <span class="material-icons">arrow_back</span>
-            </button>
-            <div class="section-header-title">{{ getSectionTitle() }}</div>
-        </div>
-        <app-member-list
-            [title]="getSectionTitle()"
-            [members]="getSectionMembers()"
-            [variant]="selectedSection"
-            (memberClick)="viewMember($event)"
-        ></app-member-list>
-    </div>
-
-    <!-- Main View with Section Summary Cards -->
-    <div *ngIf="!selectedSection">
-        <!-- Search Bar -->
-        <div class="members-search">
-            <input
-                type="search"
-                class="members-search-input"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange($event)"
-                placeholder="Search members..."
-            />
+<ion-content [fullscreen]="true" class="members-content">
+    <div class="members-page">
+        <!-- Section Member List View -->
+        <div *ngIf="selectedSection">
+            <div class="section-header">
+                <button type="button" class="back-button" (click)="closeSection()">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div class="section-header-title">{{ getSectionTitle() }}</div>
+            </div>
+            <app-member-list
+                [title]="getSectionTitle()"
+                [members]="getSectionMembers()"
+                [variant]="selectedSection"
+                (memberClick)="viewMember($event)"
+            ></app-member-list>
         </div>
 
         <!-- Section Summary Cards -->
-        <div class="section-cards-container">
+        <div class="section-cards-container" *ngIf="!selectedSection">
             <!-- Pending Renew Card -->
-            <div class="section-summary-card" (click)="viewSection('renew')" *ngIf="getRenewMembers().length > 0">
+            <div class="section-summary-card" (click)="viewSection('renew')">
                 <div class="card-icon renew-icon">
-                    <span class="material-icons">group</span>
+                    <span class="material-icons">autorenew</span>
                 </div>
                 <div class="card-content-container">
-                    <div class="card-content">
-                        <div class="card-title">Pending Renew</div>
-                        <div class="card-info">
-                            <span>Members: {{ getRenewMembers().length }}</span>
-                        </div>
-                    </div>
-                    <div class="card-avatars">
-                        <div
-                            class="avatar-stack"
-                            *ngFor="let member of getSectionAvatars(getRenewMembers()); let i = index"
-                            [style.z-index]="10 - i"
-                            [style.margin-left]="i > 0 ? '-8px' : '0'"
-                        >
-                            <div class="avatar-circle">
-                                {{ member.name ? member.name.charAt(0) : '?' }}
-                            </div>
-                        </div>
-                        <div class="avatar-count" *ngIf="getRemainingCount(getRenewMembers()) > 0">
-                            {{ getRemainingCount(getRenewMembers()) }}+
-                        </div>
-                    </div>
+                    <div class="card-title">Pending Renew</div>
+                    <span>Members: {{ getRenewMembers().length }}</span>
                 </div>
             </div>
 
             <!-- Active Card -->
-            <div class="section-summary-card" (click)="viewSection('active')" *ngIf="getActiveMembers().length > 0">
+            <div class="section-summary-card" (click)="viewSection('active')">
                 <div class="card-icon active-icon">
-                    <span class="material-icons">group</span>
+                    <span class="material-icons">check_circle</span>
                 </div>
                 <div class="card-content-container">
-                    <div class="card-content">
-                        <div class="card-title">Active</div>
-                        <div class="card-info">
-                            <span>Members: {{ getActiveMembers().length }}</span>
-                        </div>
-                    </div>
-                    <div class="card-avatars">
-                        <div
-                            class="avatar-stack"
-                            *ngFor="let member of getSectionAvatars(getActiveMembers()); let i = index"
-                            [style.z-index]="10 - i"
-                            [style.margin-left]="i > 0 ? '-8px' : '0'"
-                        >
-                            <div class="avatar-circle">
-                                {{ member.name ? member.name.charAt(0) : '?' }}
-                            </div>
-                        </div>
-                        <div class="avatar-count" *ngIf="getRemainingCount(getActiveMembers()) > 0">
-                            {{ getRemainingCount(getActiveMembers()) }}+
-                        </div>
-                    </div>
+                    <div class="card-title">Active</div>
+                    <span>Members: {{ getActiveMembers().length }}</span>
                 </div>
             </div>
 
             <!-- Expired Card -->
-            <div class="section-summary-card" (click)="viewSection('expired')" *ngIf="getExpiredMembers().length > 0">
+            <div class="section-summary-card" (click)="viewSection('expired')">
                 <div class="card-icon expired-icon">
-                    <span class="material-icons">group</span>
+                    <span class="material-icons">schedule</span>
                 </div>
                 <div class="card-content-container">
-                    <div class="card-content">
-                        <div class="card-title">Expired</div>
-                        <div class="card-info">
-                            <span>Members: {{ getExpiredMembers().length }}</span>
-                        </div>
-                    </div>
-                    <div class="card-avatars">
-                        <div
-                            class="avatar-stack"
-                            *ngFor="let member of getSectionAvatars(getExpiredMembers()); let i = index"
-                            [style.z-index]="10 - i"
-                            [style.margin-left]="i > 0 ? '-8px' : '0'"
-                        >
-                            <div class="avatar-circle">
-                                {{ member.name ? member.name.charAt(0) : '?' }}
-                            </div>
-                        </div>
-                        <div class="avatar-count" *ngIf="getRemainingCount(getExpiredMembers()) > 0">
-                            {{ getRemainingCount(getExpiredMembers()) }}+
-                        </div>
-                    </div>
+                    <div class="card-title">Expired</div>
+                    <span>Members: {{ getExpiredMembers().length }}</span>
                 </div>
             </div>
 
             <!-- All Member Card -->
-            <div class="section-summary-card" (click)="viewSection('all')" *ngIf="getAllMembers().length > 0">
+            <div class="section-summary-card" (click)="viewSection('all')">
                 <div class="card-icon all-icon">
                     <span class="material-icons">group</span>
                 </div>
                 <div class="card-content-container">
-                    <div class="card-content">
-                        <div class="card-title">All Member</div>
-                        <div class="card-info">
-                            <span>Members: {{ getAllMembers().length }}</span>
-                        </div>
-                    </div>
-                    <div class="card-avatars">
-                        <div
-                            class="avatar-stack"
-                            *ngFor="let member of getSectionAvatars(getAllMembers()); let i = index"
-                            [style.z-index]="10 - i"
-                            [style.margin-left]="i > 0 ? '-8px' : '0'"
-                        >
-                            <div class="avatar-circle">
-                                {{ member.name ? member.name.charAt(0) : '?' }}
-                            </div>
-                        </div>
-                        <div class="avatar-count" *ngIf="getRemainingCount(getAllMembers()) > 0">
-                            {{ getRemainingCount(getAllMembers()) }}+
-                        </div>
-                    </div>
+                    <div class="card-title">All Member</div>
+                    <span>Members: {{ getAllMembers().length }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Empty State -->
-        <div *ngIf="getAllMembers().length === 0" class="members-empty">
-            <h2>No Members Found</h2>
-            <p>Start by adding your first gym member</p>
-            <button type="button" class="members-empty-button" (click)="addMember()">
-                Add Member
-            </button>
+        <!-- Notifications Section -->
+        <div class="notifications-section" *ngIf="!selectedSection && notifications.length > 0">
+            <div class="notifications-header">
+                <div class="notifications-title">Notifications</div>
+                <button type="button" class="notifications-more-button" (click)="viewAllNotifications()">
+                    More
+                </button>
+            </div>
+            <div class="notifications-list">
+                <div class="notification-card" *ngFor="let notification of notifications">
+                    <div class="notification-icon">
+                        <span class="material-icons">notifications</span>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-tags">
+                            <span class="tag tag-type">Renewal</span>
+                        </div>
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-message">{{ notification.message }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
+        
+        <!-- Empty State -->
+        <app-no-data-found
+            *ngIf="getAllMembers().length === 0"
+            icon="person_add"
+            title="No Members Found"
+            message="Start by adding your first gym member"
+            [showAction]="true"
+            actionLabel="Add Member"
+            actionIcon="add"
+            (onActionClick)="addMember()">
+        </app-no-data-found>
 
         <!-- Floating Action Button -->
         <button
             type="button"
             class="members-fab"
-            (click)="addMember()"
-        >
+            (click)="addMember()">
             <span class="material-icons">add</span>
         </button>
     </div>
-</div>
+</ion-content>

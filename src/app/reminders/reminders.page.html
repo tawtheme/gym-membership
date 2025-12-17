@@ -1,0 +1,80 @@
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+            <ion-title size="large">Reminders</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <div class="reminders-page">
+        <!-- Filter Tabs -->
+        <div class="reminders-tabs">
+            <button 
+                type="button" 
+                class="tab-button" 
+                [class.active]="filterType === 'all'"
+                (click)="setFilterTab('all')">
+                ALL
+            </button>
+            <button 
+                type="button" 
+                class="tab-button" 
+                [class.active]="filterType === 'upcoming'"
+                (click)="setFilterTab('upcoming')">
+                UPCOMING
+            </button>
+            <button 
+                type="button" 
+                class="tab-button" 
+                [class.active]="filterType === 'sent'"
+                (click)="setFilterTab('sent')">
+                SENT
+            </button>
+        </div>
+
+        <!-- Reminders List -->
+        <div class="reminders-list" *ngIf="filteredReminders.length > 0">
+            <div class="reminder-item" *ngFor="let reminder of filteredReminders">
+                <div class="reminder-icon">
+                    <span class="material-icons">notifications</span>
+                </div>
+                <div class="reminder-content">
+                    <div class="reminder-title">
+                        {{ reminder.title }}
+                    </div>
+                    <div class="reminder-message">
+                        {{ reminder.message }}
+                    </div>
+                    <div class="reminder-tags">
+                        <span class="tag tag-type">{{ reminder.type | titlecase }}</span>
+                        <span class="tag" [class.tag-sent]="reminder.isSent" [class.tag-pending]="!reminder.isSent">
+                            {{ reminder.isSent ? 'Sent' : 'Pending' }}
+                        </span>
+                    </div>
+                    <div class="reminder-scheduled">
+                        Scheduled: {{ formatScheduledDate(reminder.scheduledDate) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <app-no-data-found
+            *ngIf="filteredReminders.length === 0"
+            icon="notifications_none"
+            title="No Reminders Found"
+            [message]="filterType !== 'all' ? 'No reminders match the selected filter' : 'Create your first reminder to get started'"
+            [showAction]="filterType === 'all'"
+            actionLabel="Create Reminder"
+            actionIcon="add"
+            (onActionClick)="createReminder()">
+        </app-no-data-found>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button
+        type="button"
+        class="reminders-fab"
+        (click)="createReminder()">
+        <span class="material-icons">add</span>
+    </button>
+</ion-content>

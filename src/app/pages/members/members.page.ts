@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController, AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../../services/member';
-import { Member } from '../../models/member.interface';
+import { Member, Reminder } from '../../models/member.interface';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
+import { DataService } from '../../services/data.service';
+import { AddMemberPage } from '../add-member/add-member.page';
 
 @Component({
   selector: 'app-members',
@@ -17,21 +19,25 @@ export class MembersPage implements OnInit {
   searchTerm: string = '';
   filterType: string = 'all';
   selectedSection: 'renew' | 'expired' | 'active' | 'all' | null = null;
+  notifications: Reminder[] = [];
 
   constructor(
     private memberService: MemberService,
     private router: Router,
     private toastController: ToastController,
     private alertController: AlertController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private dataService: DataService
   ) { }
 
   async ngOnInit() {
     await this.loadMembers();
+    await this.loadNotifications();
   }
 
   async ionViewWillEnter() {
     await this.loadMembers();
+    await this.loadNotifications();
   }
 
   async loadMembers() {
@@ -43,6 +49,38 @@ export class MembersPage implements OnInit {
       this.showToast('Error loading members', 'danger');
     }
   }
+
+  async loadNotifications() {
+    try {
+      const allNotifications = await this.dataService.getReminders();
+      // Filter to show only renewal notifications
+      this.notifications = allNotifications.filter(n => n.type === 'renewal');
+      // Sort by scheduled date, newest first
+      this.notifications.sort((a, b) => 
+        new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime()
+      );
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  }
+
+  formatScheduledDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  viewAllNotifications() {
+    // Navigate to a notifications page or show all notifications
+    // For now, this can be a placeholder or navigate to a dedicated notifications page
+    console.log('View all notifications');
+  }
+
 
   onSearchChange(event: any) {
     this.searchTerm = event.target.value;
@@ -59,28 +97,38 @@ export class MembersPage implements OnInit {
 
   getRenewMembers(): Member[] {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     const sevenDaysFromNow = new Date(now);
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+    sevenDaysFromNow.setHours(23, 59, 59, 999);
 
     return this.getFilteredMembers().filter(member => {
       const endDate = new Date(member.endDate);
+      endDate.setHours(0, 0, 0, 0);
       return member.isActive && endDate >= now && endDate <= sevenDaysFromNow;
     });
   }
 
   getExpiredMembers(): Member[] {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     return this.getFilteredMembers().filter(member => {
       const endDate = new Date(member.endDate);
+      endDate.setHours(0, 0, 0, 0);
       return endDate < now;
     });
   }
 
   getActiveMembers(): Member[] {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     return this.getFilteredMembers().filter(member => {
       const endDate = new Date(member.endDate);
-      return member.isActive && endDate >= now;
+      endDate.setHours(0, 0, 0, 0);
+      // Active members: isActive and endDate is in the future (not expiring within 7 days)
+      const sevenDaysFromNow = new Date(now);
+      sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+      return member.isActive && endDate > sevenDaysFromNow;
     });
   }
 
@@ -106,24 +154,56 @@ export class MembersPage implements OnInit {
     return members.length;
   }
 
-  addMember() {
-    this.router.navigate(['/add-member']);
+  async addMember() {
+    const modal = await this.modalCtrl.create({
+      component: AddMemberPage,
+      cssClass: 'add-member-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.success) {
+      await this.loadMembers();
+    }
   }
 
   async viewMember(member: Member) {
     const modal = await this.modalCtrl.create({
       component: MemberDetailComponent,
-      componentProps: { member },
+      componentProps: { 
+        member,
+        onDelete: async (memberToDelete: Member) => {
+          await this.deleteMember(memberToDelete);
+        }
+      },
       cssClass: 'member-detail-modal'
     });
 
     await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.deleted) {
+      await this.loadMembers();
+    }
   }
 
-  editMember(member: Member) {
-    this.router.navigate(['/add-member'], {
-      queryParams: { id: member.id, edit: true }
+  async editMember(member: Member) {
+    const modal = await this.modalCtrl.create({
+      component: AddMemberPage,
+      componentProps: {
+        memberId: member.id,
+        memberData: member
+      },
+      cssClass: 'add-member-modal'
     });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.success) {
+      await this.loadMembers();
+    }
   }
 
   viewSection(section: 'renew' | 'expired' | 'active' | 'all') {

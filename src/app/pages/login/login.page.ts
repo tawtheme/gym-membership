@@ -50,8 +50,18 @@ export class LoginPage implements OnInit {
       } else {
         this.showToast('Invalid credentials', 'danger');
       }
-    } catch (error) {
-      this.showToast('Login failed. Please try again.', 'danger');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMessage = error?.message || error?.toString() || '';
+      
+      // Check if it's a database initialization error
+      if (errorMessage.includes('Database not initialized') || 
+          errorMessage.includes('timeout') ||
+          errorMessage.includes('WASM')) {
+        this.showToast('Database initialization failed. Please refresh the page and try again.', 'danger');
+      } else {
+        this.showToast('Login failed. Please try again.', 'danger');
+      }
     } finally {
       this.isLoading = false;
     }

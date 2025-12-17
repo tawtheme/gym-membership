@@ -1,6 +1,29 @@
 <section class="members-section" *ngIf="members && members.length">
-    <div class="section-cards">
-        <div class="section-card" *ngFor="let member of members" (click)="onMemberClick(member)">
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-input-wrapper">
+            <span class="material-icons search-icon">search</span>
+            <input 
+                type="search" 
+                class="search-input" 
+                placeholder="Search members..."
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onSearchChange()"
+            />
+            <button 
+                type="button" 
+                class="search-clear" 
+                *ngIf="searchQuery"
+                (click)="clearSearch()"
+            >
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Member Cards -->
+    <div class="section-cards" *ngIf="filteredMembers && filteredMembers.length > 0">
+        <div class="section-card" *ngFor="let member of filteredMembers" (click)="onMemberClick(member)">
             <div class="card-icon" [ngClass]="variant + '-icon'">
                 <ng-container *ngIf="member.avatarUrl; else defaultAvatar">
                     <img [src]="member.avatarUrl" alt="{{ member.name }}" />
@@ -19,4 +42,12 @@
             </div>
         </div>
     </div>
+
+    <!-- Empty State -->
+    <app-no-data-found
+        *ngIf="filteredMembers && filteredMembers.length === 0"
+        icon="search_off"
+        title="No Members Found"
+        [message]="searchQuery ? 'No members found matching \"' + searchQuery + '\"' : 'No members available in this section'"
+    ></app-no-data-found>
 </section>

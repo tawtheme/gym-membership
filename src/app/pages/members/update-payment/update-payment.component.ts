@@ -1,0 +1,119 @@
+import { Component, OnInit, Input } from '@angular/core';
+import { ModalController, ToastController } from '@ionic/angular';
+import { Member, PaymentTransaction } from '../../../models/member.interface';
+import { DataService } from '../../../services/data.service';
+import { MemberService } from '../../../services/member';
+
+@Component({
+  selector: 'app-update-payment',
+  templateUrl: './update-payment.component.html',
+  styleUrls: ['./update-payment.component.scss'],
+  standalone: false
+})
+export class UpdatePaymentComponent implements OnInit {
+  @Input() member!: Member;
+
+  paymentAmount: number = 0;
+  paymentDate: string = new Date().toISOString().split('T')[0];
+  paymentMode: 'cash' | 'card' | 'online' | 'upi' = 'cash';
+  description: string = '';
+
+  membershipAmounts = {
+    monthly: 1000,
+    quarterly: 2700,
+    yearly: 10000
+  };
+
+  constructor(
+    private modalController: ModalController,
+    private toastController: ToastController,
+    private dataService: DataService,
+    private memberService: MemberService
+  ) { }
+
+  ngOnInit() {
+    // Set default amount based on membership type
+    this.paymentAmount = this.membershipAmounts[this.member.membershipType];
+    this.description = `${this.member.membershipType} membership payment`;
+  }
+
+  dismiss() {
+    this.modalController.dismiss();
+  }
+
+  getPaymentModeIcon(mode: string): string {
+    const icons: { [key: string]: string } = {
+      cash: 'payments',
+      card: 'credit_card',
+      online: 'account_balance',
+      upi: 'qr_code'
+    };
+    return icons[mode] || 'payment';
+  }
+
+  async savePayment() {
+    if (!this.paymentAmount || this.paymentAmount <= 0) {
+      this.showToast('Please enter a valid payment amount', 'danger');
+      return;
+    }
+
+    if (!this.paymentDate) {
+      this.showToast('Please select a payment date', 'danger');
+      return;
+    }
+
+    try {
+      // Create payment transaction
+      const transaction: Omit<PaymentTransaction, 'id' | 'createdAt'> = {
+        memberId: this.member.id,
+        amount: this.paymentAmount,
+        paymentDate: new Date(this.paymentDate).toISOString(),
+        paymentMode: this.paymentMode,
+        description: this.description || `${this.member.membershipType} membership payment`
+      };
+
+      await this.dataService.addPaymentTransaction(transaction);
+
+      // Update member's last payment date and extend membership
+      const paymentDateObj = new Date(this.paymentDate);
+      const updatedMember: Partial<Member> = {
+        lastPaymentDate: paymentDateObj.toISOString(),
+        isActive: true
+      };
+
+      // Calculate new end date based on membership type
+      const newEndDate = new Date(paymentDateObj);
+      switch (this.member.membershipType) {
+        case 'monthly':
+          newEndDate.setMonth(newEndDate.getMonth() + 1);
+          break;
+        case 'quarterly':
+          newEndDate.setMonth(newEndDate.getMonth() + 3);
+          break;
+        case 'yearly':
+          newEndDate.setFullYear(newEndDate.getFullYear() + 1);
+          break;
+      }
+      updatedMember.endDate = newEndDate.toISOString();
+      updatedMember.nextPaymentDate = newEndDate.toISOString();
+
+      await this.memberService.updateMember(this.member.id, updatedMember);
+
+      this.showToast('Payment recorded successfully', 'success');
+      this.modalController.dismiss({ success: true, member: { ...this.member, ...updatedMember } });
+    } catch (error) {
+      console.error('Error saving payment:', error);
+      this.showToast('Error saving payment. Please try again.', 'danger');
+    }
+  }
+
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+}

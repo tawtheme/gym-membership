@@ -1,0 +1,57 @@
+<div class="payment-transactions">
+    <!-- Filter Tabs -->
+    <div class="transactions-tabs">
+        <button 
+            type="button" 
+            class="tab-button" 
+            [class.active]="filterTab === 'all'"
+            (click)="setFilterTab('all')">
+            ALL
+        </button>
+        <button 
+            type="button" 
+            class="tab-button" 
+            [class.active]="filterTab === 'recent'"
+            (click)="setFilterTab('recent')">
+            RECENT
+        </button>
+        <button 
+            type="button" 
+            class="tab-button" 
+            [class.active]="filterTab === 'thisMonth'"
+            (click)="setFilterTab('thisMonth')">
+            THIS MONTH
+        </button>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="transactions-list" *ngIf="filteredTransactions.length > 0">
+        <div class="transaction-item" *ngFor="let transaction of filteredTransactions">
+            <div class="transaction-icon">
+                <span class="material-icons">{{ getPaymentModeIcon(transaction.paymentMode) }}</span>
+            </div>
+            <div class="transaction-content">
+                <div class="transaction-title">
+                    Payment received via {{ transaction.paymentMode | titlecase }}
+                </div>
+                <div class="transaction-message-info">
+                    <div class="transaction-message">Membership Payment</div>
+                    <div class="transaction-scheduled">
+                        Paid: {{ formatScheduledDate(transaction.paymentDate) }}
+                    </div>
+                </div>
+            </div>
+            <div class="transaction-amount">
+                ₹{{ transaction.amount | number }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <app-no-data-found
+        *ngIf="filteredTransactions.length === 0"
+        icon="receipt_long"
+        title="No Transactions Found"
+        [message]="searchTerm ? 'No transactions match your search' : 'No payment transactions available'">
+    </app-no-data-found>
+</div>

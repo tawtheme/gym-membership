@@ -43,7 +43,17 @@ export class DatabaseOperationsService {
       });
     }
 
-    await this.initPromise;
+    // Add timeout to prevent infinite waiting
+    await Promise.race([
+      this.initPromise,
+      new Promise<void>((_, reject) =>
+        setTimeout(() => {
+          console.error('Database initialization timeout - operation cancelled');
+          this.initPromise = null;
+          reject(new Error('Database initialization timeout'));
+        }, 20000) // 20 second timeout
+      )
+    ]);
   }
 
   // User operations

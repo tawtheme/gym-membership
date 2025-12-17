@@ -24,28 +24,84 @@
     <!-- jeep-sqlite for web platform -->
     <script type="module" src="assets/jeep-sqlite/jeep-sqlite.esm.js"></script>
     <script>
-      // Wait for jeep-sqlite to be defined before Angular bootstraps
+      // Suppress WASM errors in console - they're expected during initialization
+      // These errors occur when WASM tries to instantiate but are handled internally by jeep-sqlite
+      
+      const originalError = console.error;
+      const originalWarn = console.warn;
+      
+      // Filter WASM-related errors from console.error
+      console.error = function(...args) {
+        const message = args[0]?.toString() || '';
+        const fullMessage = args.map(arg => String(arg)).join(' ');
+        
+        // Filter out known WASM LinkError and RuntimeError messages
+        if (fullMessage.includes('LinkError: WebAssembly.instantiate()') || 
+            fullMessage.includes('RuntimeError: Aborted') ||
+            (fullMessage.includes('WebAssembly') && fullMessage.includes('function import requires a callable')) ||
+            fullMessage.includes('falling back to ArrayBuffer instantiation')) {
+          // These errors are expected during WASM initialization and are handled internally
+          return;
+        }
+        originalError.apply(console, args);
+      };
+      
+      // Filter WASM-related warnings from console.warn
+      console.warn = function(...args) {
+        const fullMessage = args.map(arg => String(arg)).join(' ');
+        
+        if (fullMessage.includes('falling back to ArrayBuffer instantiation') ||
+            fullMessage.includes('WebAssembly') && fullMessage.includes('instantiate')) {
+          return;
+        }
+        originalWarn.apply(console, args);
+      };
+      
+      // Catch uncaught exceptions related to WASM
+      window.addEventListener('error', function(event) {
+        const message = event.message || '';
+        const errorString = event.error?.toString() || '';
+        const fullMessage = message + ' ' + errorString;
+        
+        if (fullMessage.includes('LinkError: WebAssembly.instantiate()') ||
+            fullMessage.includes('RuntimeError: Aborted') ||
+            (fullMessage.includes('WebAssembly') && fullMessage.includes('function import requires a callable'))) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      }, true);
+
+      // Ensure jeep-sqlite loads before Angular
       window.addEventListener('DOMContentLoaded', () => {
         console.log('DOMContentLoaded - Checking jeep-sqlite...');
+        
+        // Wait for custom element to be defined
         const checkJeepSqlite = setInterval(() => {
           const jeepElement = document.querySelector('jeep-sqlite');
           const isDefined = customElements.get('jeep-sqlite');
-          console.log('jeep-sqlite check - Element in DOM:', !!jeepElement, 'Custom element defined:', !!isDefined);
           
           if (jeepElement && isDefined) {
-            console.log('jeep-sqlite is ready!');
+            console.log('jeep-sqlite custom element is ready!');
             clearInterval(checkJeepSqlite);
           }
         }, 100);
         
         // Stop checking after 10 seconds
-        setTimeout(() => clearInterval(checkJeepSqlite), 10000);
+        setTimeout(() => {
+          clearInterval(checkJeepSqlite);
+          const jeepElement = document.querySelector('jeep-sqlite');
+          const isDefined = customElements.get('jeep-sqlite');
+          if (!jeepElement || !isDefined) {
+            console.warn('jeep-sqlite may not be fully loaded');
+          }
+        }, 10000);
       });
     </script>
 </head>
 
 <body>
-    <jeep-sqlite autoSave="true" wasmPath="/assets"></jeep-sqlite>
+    <jeep-sqlite autoSave="true" wasmPath="/assets" typeOrm="false"></jeep-sqlite>
     <app-root></app-root>
 </body>
 

@@ -1,0 +1,103 @@
+<ion-header translucent="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button fill="clear" (click)="dismiss()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Update Payment</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <div class="update-payment" *ngIf="member">
+        <div class="member-info">
+            <div class="member-name">{{ member.name }}</div>
+            <div class="member-type">{{ member.membershipType | titlecase }} Membership</div>
+        </div>
+
+        <div class="payment-form">
+            <div class="form-group">
+                <label>Payment Amount</label>
+                <input 
+                    type="number" 
+                    class="form-input" 
+                    [(ngModel)]="paymentAmount" 
+                    placeholder="Enter amount"
+                    min="0"
+                    step="0.01"
+                />
+            </div>
+
+            <div class="form-group">
+                <label>Payment Date</label>
+                <input 
+                    type="date" 
+                    class="form-input" 
+                    [(ngModel)]="paymentDate"
+                />
+            </div>
+
+            <div class="form-group">
+                <label>Payment Mode</label>
+                <div class="payment-modes">
+                    <button 
+                        type="button"
+                        class="payment-mode-btn" 
+                        [class.active]="paymentMode === 'cash'"
+                        (click)="paymentMode = 'cash'"
+                    >
+                        <span class="material-icons">{{ getPaymentModeIcon('cash') }}</span>
+                        <span>Cash</span>
+                    </button>
+                    <button 
+                        type="button"
+                        class="payment-mode-btn" 
+                        [class.active]="paymentMode === 'card'"
+                        (click)="paymentMode = 'card'"
+                    >
+                        <span class="material-icons">{{ getPaymentModeIcon('card') }}</span>
+                        <span>Card</span>
+                    </button>
+                    <button 
+                        type="button"
+                        class="payment-mode-btn" 
+                        [class.active]="paymentMode === 'online'"
+                        (click)="paymentMode = 'online'"
+                    >
+                        <span class="material-icons">{{ getPaymentModeIcon('online') }}</span>
+                        <span>Online</span>
+                    </button>
+                    <button 
+                        type="button"
+                        class="payment-mode-btn" 
+                        [class.active]="paymentMode === 'upi'"
+                        (click)="paymentMode = 'upi'"
+                    >
+                        <span class="material-icons">{{ getPaymentModeIcon('upi') }}</span>
+                        <span>UPI</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description (Optional)</label>
+                <textarea 
+                    class="form-textarea" 
+                    [(ngModel)]="description" 
+                    placeholder="Add payment description"
+                    rows="3"
+                ></textarea>
+            </div>
+        </div>
+
+        <div class="payment-actions">
+            <button type="button" class="action-button cancel" (click)="dismiss()">
+                Cancel
+            </button>
+            <button type="button" class="action-button save" (click)="savePayment()">
+                Save Payment
+            </button>
+        </div>
+    </div>
+</ion-content>

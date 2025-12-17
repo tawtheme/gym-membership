@@ -4,13 +4,17 @@ import { AuthService } from '../services/auth';
 import { StorageService } from '../services/storage';
 
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss'],
+  selector: 'app-account',
+  templateUrl: 'account.page.html',
+  styleUrls: ['account.page.scss'],
   standalone: false,
 })
-export class Tab1Page implements OnInit {
+export class AccountPage implements OnInit {
   currentUser: string | null = null;
+  userName: string = 'John Doe';
+  userEmail: string = 'john.doe@example.com';
+  userAddress: string = '123 Main Street, City, State 12345';
+  monthlyActivePlan: string = 'Premium Plan';
   settings = {
     notifications: true,
     autoBackup: false
