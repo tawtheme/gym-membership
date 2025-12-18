@@ -40,16 +40,6 @@ export class MemberService {
     return members.filter(member => member.isActive);
   }
 
-  async getExpiringMembers(days: number = 7): Promise<MemberModel[]> {
-    const members = await this.getActiveMembers();
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + days);
-    
-    return members.filter(member => {
-      const endDate = new Date(member.endDate);
-      return endDate <= targetDate;
-    });
-  }
 
   async createReminder(reminderData: Omit<Reminder, 'id' | 'createdAt'>): Promise<string> {
     const reminderId = await this.storageService.addReminder(reminderData);
@@ -122,16 +112,4 @@ export class MemberService {
     }
   }
 
-  async checkAndSendReminders(): Promise<void> {
-    const upcomingReminders = await this.getUpcomingReminders(1);
-    
-    for (const reminder of upcomingReminders) {
-      if (!reminder.isSent) {
-        // Mark as sent
-        await this.storageService.updateMember(reminder.memberId, {});
-        // You could also implement SMS/email sending here
-        console.log(`Sending reminder: ${reminder.title} - ${reminder.message}`);
-      }
-    }
-  }
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
 import { MemberService } from '../services/member';
 import { Reminder } from '../models/member.interface';
 import { SnackbarService } from '../shared/snackbar/snackbar.service';
@@ -25,8 +24,6 @@ export class RemindersPage implements OnInit {
 
   constructor(
     private memberService: MemberService,
-    private alertController: AlertController,
-    private modalController: ModalController,
     private snackbar: SnackbarService
   ) {}
 
@@ -50,10 +47,6 @@ export class RemindersPage implements OnInit {
 
   setFilterTab(tab: 'all' | 'upcoming' | 'sent') {
     this.filterType = tab;
-    this.applyFilters();
-  }
-
-  onFilterChange() {
     this.applyFilters();
   }
 
@@ -121,57 +114,6 @@ export class RemindersPage implements OnInit {
       console.error('Error creating reminder:', error);
       this.showToast('Error creating reminder', 'danger');
     }
-  }
-
-  async markAsSent(reminder: Reminder) {
-    try {
-      // In a real implementation, you would update the reminder status
-      this.showToast('Reminder marked as sent', 'success');
-      await this.loadReminders();
-    } catch (error) {
-      this.showToast('Error updating reminder', 'danger');
-    }
-  }
-
-  async deleteReminder(reminder: Reminder) {
-    const alert = await this.alertController.create({
-      header: 'Delete Reminder',
-      message: `Are you sure you want to delete "${reminder.title}"?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Delete',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              // In a real implementation, you would delete the reminder
-              this.showToast('Reminder deleted successfully', 'success');
-              await this.loadReminders();
-            } catch (error) {
-              this.showToast('Error deleting reminder', 'danger');
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  getReminderBadgeColor(type: string): string {
-    switch (type) {
-      case 'payment': return 'primary';
-      case 'renewal': return 'secondary';
-      case 'custom': return 'tertiary';
-      default: return 'medium';
-    }
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   }
 
   formatScheduledDate(dateString: string): string {

@@ -21,7 +21,7 @@ import { UpdatePaymentComponent } from './update-payment/update-payment.componen
     MembersPageRoutingModule,
     SharedModule
   ],
-  declarations: [MembersPage, MemberListComponent, MemberDetailComponent, PaymentTransactionsComponent, MemberProfileComponent, UpdatePaymentComponent],
+  declarations: [MembersPage, MemberListComponent, MemberDetailComponent, PaymentTransactionsComponent, UpdatePaymentComponent],
   exports: [PaymentTransactionsComponent, UpdatePaymentComponent]
 })
 export class MembersPageModule {}

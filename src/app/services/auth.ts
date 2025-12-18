@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { SqliteService } from './sqlite.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +10,7 @@ export class AuthService {
   public isAuthenticated$ = this._isAuthenticated.asObservable();
 
   constructor(
-    private storage: Storage,
-    private router: Router,
-    private sqliteService: SqliteService
+    private storage: Storage
   ) {
     this.init();
   }
@@ -26,42 +22,6 @@ export class AuthService {
     this._isAuthenticated.next(true);
   }
 
-  async login(mobileNumber: string, pin: string): Promise<boolean> {
-    try {
-      // Authenticate using database
-      const isValid = await this.sqliteService.authenticateUser(mobileNumber, pin);
-      
-      if (isValid) {
-        await this.storage.set('isLoggedIn', true);
-        await this.storage.set('currentUser', mobileNumber);
-        this._isAuthenticated.next(true);
-        return true;
-      }
-      return false;
-    } catch (error: any) {
-      console.error('Login error:', error);
-      const errorMessage = error?.message || error?.toString() || '';
-      
-      // Re-throw database initialization errors so login page can handle them
-      if (errorMessage.includes('Database not initialized') || 
-          errorMessage.includes('timeout') ||
-          errorMessage.includes('WASM')) {
-        throw new Error('Database initialization failed. Please refresh the page.');
-      }
-      
-      return false;
-    }
-  }
-
-  async logout(): Promise<void> {
-    // Logout disabled - app no longer requires login
-    // Just navigate to tabs
-    this.router.navigate(['/tabs']);
-  }
-
-  async getCurrentUser(): Promise<string | null> {
-    return await this.storage.get('currentUser');
-  }
 
   isAuthenticated(): boolean {
     return this._isAuthenticated.value;

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, AlertController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { SqliteService } from '../services/sqlite.service';
 import { PaymentTransaction, Member } from '../models/member.interface';
 import { UpdatePaymentComponent } from '../pages/members/update-payment/update-payment.component';
@@ -22,7 +22,6 @@ export class PaymentsPage implements OnInit {
   constructor(
     private sqliteService: SqliteService,
     private modalController: ModalController,
-    private alertController: AlertController,
     private snackbar: SnackbarService
   ) {}
 

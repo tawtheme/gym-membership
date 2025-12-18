@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Member, Reminder, BackupSettings } from '../models/member.interface';
+import { Member, Reminder } from '../models/member.interface';
 import { SqliteService } from './sqlite.service';
 
 @Injectable({
@@ -39,20 +39,8 @@ export class StorageService {
   }
 
   // Backup operations
-  async getBackupSettings(): Promise<BackupSettings> {
-    return await this.sqliteService.getBackupSettings();
-  }
-
-  async updateBackupSettings(settings: BackupSettings): Promise<void> {
-    await this.sqliteService.updateBackupSettings(settings);
-  }
-
   async createBackup(): Promise<string> {
     return await this.sqliteService.createBackup();
-  }
-
-  async restoreBackup(backupData: string): Promise<boolean> {
-    return await this.sqliteService.restoreBackup(backupData);
   }
 
   async clearAllData(): Promise<void> {
