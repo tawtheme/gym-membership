@@ -15,6 +15,8 @@ export const CREATE_TABLES_SQL = {
       name TEXT NOT NULL,
       phone TEXT NOT NULL,
       email TEXT,
+      address TEXT,
+      avatar_url TEXT,
       membership_type TEXT NOT NULL,
       start_date TEXT NOT NULL,
       end_date TEXT NOT NULL,

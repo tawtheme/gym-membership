@@ -158,36 +158,6 @@ export class DatabaseInitService {
     });
   }
 
-  private async waitForJeepSqliteWasmReady(): Promise<void> {
-    return new Promise((resolve) => {
-      console.log('Waiting for jeep-sqlite WASM to be ready...');
-      
-      // Reduced wait time - don't wait too long
-      let attempts = 0;
-      const maxAttempts = 30; // 3 seconds max
-      
-      const checkInterval = setInterval(() => {
-        attempts++;
-        
-        // Check if WebAssembly is available
-        const hasWebAssembly = typeof WebAssembly !== 'undefined';
-        
-        // Don't wait for SQL - just check WebAssembly and proceed quickly
-        if (hasWebAssembly && attempts > 5) {
-          console.log('WASM appears ready after', attempts * 100, 'ms');
-          clearInterval(checkInterval);
-          // Minimal wait - WASM errors are expected and handled internally
-          setTimeout(resolve, 500);
-        } else if (attempts >= maxAttempts) {
-          clearInterval(checkInterval);
-          console.warn('WASM readiness check timeout, proceeding...');
-          resolve();
-        }
-      }, 100);
-    });
-  }
-
-
   private async createTables(): Promise<void> {
     if (!this.database) return;
 
@@ -216,7 +186,4 @@ export class DatabaseInitService {
     }
   }
 
-  getDatabase(): SQLiteDBConnection | null {
-    return this.database;
-  }
 }

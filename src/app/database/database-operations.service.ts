@@ -81,23 +81,6 @@ export class DatabaseOperationsService {
     return !!(result.values && result.values.length > 0);
   }
 
-  async addUser(mobileNumber: string, pin: string): Promise<boolean> {
-    await this.ensureDatabaseInitialized();
-    if (!this.database) throw new Error('Database not initialized');
-    
-    try {
-      const now = new Date().toISOString();
-      await this.database.run(`
-        INSERT INTO ${TABLE_NAMES.USERS} (mobile_number, pin, created_at, updated_at) 
-        VALUES (?, ?, ?, ?)
-      `, [mobileNumber, pin, now, now]);
-      return true;
-    } catch (error) {
-      console.error('Error adding user:', error);
-      return false;
-    }
-  }
-
   // Member operations
   async addMember(member: any): Promise<string> {
     await this.ensureDatabaseInitialized();
@@ -107,9 +90,9 @@ export class DatabaseOperationsService {
     const now = new Date().toISOString();
     
     await this.database.run(`
-      INSERT INTO ${TABLE_NAMES.MEMBERS} (id, name, phone, email, membership_type, start_date, end_date, is_active, last_payment_date, next_payment_date, notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, member.name, member.phone, member.email || null, member.membershipType, member.startDate, member.endDate, member.isActive ? 1 : 0, member.lastPaymentDate || null, member.nextPaymentDate || null, member.notes || null, now, now]);
+      INSERT INTO ${TABLE_NAMES.MEMBERS} (id, name, phone, email, address, avatar_url, membership_type, start_date, end_date, is_active, last_payment_date, next_payment_date, notes, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, member.name, member.phone, member.email || null, member.address || null, member.avatarUrl || null, member.membershipType, member.startDate, member.endDate, member.isActive ? 1 : 0, member.lastPaymentDate || null, member.nextPaymentDate || null, member.notes || null, now, now]);
     
     return id;
   }
@@ -140,10 +123,33 @@ export class DatabaseOperationsService {
     const setClause = [];
     const values = [];
     
+    // Map camelCase to snake_case for database columns
+    const fieldMapping: { [key: string]: string } = {
+      'name': 'name',
+      'phone': 'phone',
+      'email': 'email',
+      'address': 'address',
+      'avatarUrl': 'avatar_url',
+      'membershipType': 'membership_type',
+      'startDate': 'start_date',
+      'endDate': 'end_date',
+      'isActive': 'is_active',
+      'lastPaymentDate': 'last_payment_date',
+      'nextPaymentDate': 'next_payment_date',
+      'notes': 'notes',
+      'updatedAt': 'updated_at'
+    };
+    
     Object.keys(updates).forEach(key => {
-      if (key !== 'id' && key !== 'createdAt') {
-        setClause.push(`${key} = ?`);
-        values.push(updates[key]);
+      if (key !== 'id' && key !== 'createdAt' && fieldMapping[key]) {
+        const dbField = fieldMapping[key];
+        setClause.push(`${dbField} = ?`);
+        // Convert boolean to integer for isActive
+        if (key === 'isActive') {
+          values.push(updates[key] ? 1 : 0);
+        } else {
+          values.push(updates[key]);
+        }
       }
     });
     
@@ -296,6 +302,8 @@ export class DatabaseOperationsService {
       name: row['name'],
       phone: row['phone'],
       email: row['email'],
+      address: row['address'],
+      avatarUrl: row['avatar_url'],
       membershipType: row['membership_type'],
       startDate: row['start_date'],
       endDate: row['end_date'],

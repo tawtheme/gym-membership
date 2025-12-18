@@ -6,58 +6,6 @@
     </ion-header>
 
     <div class="account-page">
-        <!-- User Info Section -->
-        <section class="account-section">
-            <div class="section-title">Account Information</div>
-            <div class="account-card">
-                <div class="info-item">
-                    <div class="info-icon">
-                        <span class="material-icons">person</span>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-value">Name</div>
-                        <div class="info-label">{{ userName || 'Not set' }}</div>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="info-item">
-                    <div class="info-icon">
-                        <span class="material-icons">email</span>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-value">Email Address</div>
-                        <div class="info-label">{{ userEmail || 'Not set' }}</div>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="info-item">
-                    <div class="info-icon">
-                        <span class="material-icons">phone</span>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-value">Mobile Number</div>
-                        <div class="info-label">{{ currentUser || 'Not logged in' }}</div>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="info-item">
-                    <div class="info-icon">
-                        <span class="material-icons">home</span>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-value">Address</div>
-                        <div class="info-label">{{ userAddress || 'Not set' }}</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- App Settings Section -->
         <section class="account-section">
             <div class="section-title">App Settings</div>
@@ -146,14 +94,6 @@
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Logout Section -->
-        <section class="account-section">
-            <button class="logout-button" (click)="logout()">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
-            </button>
         </section>
     </div>
 </ion-content>

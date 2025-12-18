@@ -11,7 +11,6 @@ import { MembersPage } from './members.page';
 import { MemberListComponent } from './member-list/member-list.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { PaymentTransactionsComponent } from './payment-transactions/payment-transactions.component';
-import { MemberProfileComponent } from './member-detail/member-profile/member-profile.component';
 import { UpdatePaymentComponent } from './update-payment/update-payment.component';
 
 @NgModule({

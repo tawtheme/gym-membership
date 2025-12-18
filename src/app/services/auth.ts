@@ -21,8 +21,9 @@ export class AuthService {
 
   async init() {
     await this.storage.create();
-    const isLoggedIn = await this.storage.get('isLoggedIn');
-    this._isAuthenticated.next(!!isLoggedIn);
+    // Auto-authenticate - no login required
+    await this.storage.set('isLoggedIn', true);
+    this._isAuthenticated.next(true);
   }
 
   async login(mobileNumber: string, pin: string): Promise<boolean> {
@@ -53,10 +54,9 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    await this.storage.remove('isLoggedIn');
-    await this.storage.remove('currentUser');
-    this._isAuthenticated.next(false);
-    this.router.navigate(['/login']);
+    // Logout disabled - app no longer requires login
+    // Just navigate to tabs
+    this.router.navigate(['/tabs']);
   }
 
   async getCurrentUser(): Promise<string | null> {
